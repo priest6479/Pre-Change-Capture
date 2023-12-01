@@ -7,17 +7,3 @@ To execute this script, edit the "devices.txt" file and list the Ip's or Hostnam
 
 
 The Script runs the following Commands on the devices lists in the "devices.txt " file
-sh run | i hostname
-sh run
-sh int status
-sh ip int bri
-sh vlan
-sh ver
-sh inventory
-sh mod
-sh mac address-table
-sh arp
-sh cdp neighbors
-sh ip protocols
-sh ip route
-sh vpc
