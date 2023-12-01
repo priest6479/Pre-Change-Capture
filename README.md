@@ -24,4 +24,5 @@ sh ip protocols<br />
 sh ip route<br /> 
 sh vpc<br /> 
 
+(This Script can be used on Cisco Devices)<br /> 
 (This Script uses Python,Netmiko and Getpass)
