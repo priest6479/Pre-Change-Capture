@@ -6,16 +6,16 @@ import os
 username = input("Please enter your Username:")
 
 # Obtain Password
-password=getpass.getpass(prompt="Please enter your Password:")
+password = getpass.getpass(prompt="Please enter your Password:")
 
 # Define Output Directory
-output_dir = 'C:\\Users\\david.digiacomo\\OneDrive - Bausch Health Companies, Inc\\Documents\\Automation\\Prod\\capture\\output\\Captured-'
+output_dir = os.getcwd()
 
 # Define the filename for the devices file
 devices_filename = "devices.txt"
 
 # Define the show commands you want to execute on this device
-commands =  ['sh run | i hostname','sh run' ,'sh int status','sh ip int bri','sh vlan','sh ver','sh inventory','sh mod','sh mac address-table','sh arp','sh cdp neighbors','sh ip protocols','sh ip route','sh vpc']
+commands = ['sh run | i hostname','sh run','sh int status','sh ip int bri','sh vlan','sh ver','sh inventory','sh mod','sh mac address-table','sh arp','sh cdp neighbors','sh ip protocols','sh ip route','sh vpc']
 
 # Open the devices file and read the list of devices
 with open(devices_filename, "r") as devices_file:
