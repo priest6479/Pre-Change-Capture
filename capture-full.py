@@ -2,14 +2,20 @@ from netmiko import ConnectHandler
 import getpass
 import os
 
+
 # Obtain Username
 username = input("Please enter your Username:")
 
 # Obtain Password
 password = getpass.getpass(prompt="Please enter your Password:")
 
+# Current working Directory
+current_dir = os.getcwd()
+
 # Define Output Directory
-output_dir = os.getcwd()
+output_dir = os.path.join(current_dir +'/output/')
+
+print(output_dir)
 
 # Define the filename for the devices file
 devices_filename = "devices.txt"
