@@ -7,3 +7,6 @@ To execute this script, edit the "devices.txt" file and list the Ip's or Hostnam
 
 
 The Script runs the following Commands on the devices lists in the "devices.txt " file
+
+sh run | i hostname
+sh run
