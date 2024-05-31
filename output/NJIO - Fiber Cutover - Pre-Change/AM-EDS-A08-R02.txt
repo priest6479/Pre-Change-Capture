@@ -1,0 +1,3394 @@
+sh run | i hostname
+hostname AM-EDS-A08-R02
+sh run
+Building configuration...
+
+Current configuration : 39337 bytes
+!
+! Last configuration change at 02:29:16 UTC Sun Jan 28 2024 by dean.mamadjanov.t1
+!
+version 15.1
+service tcp-keepalives-in
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+no platform punt-keepalive disable-kernel-core
+!
+hostname AM-EDS-A08-R02
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition internet
+ rd 12025:36458
+ !
+ address-family ipv4
+ exit-address-family
+!
+logging buffered 50000
+no logging console
+enable secret 4 UajDTFXITorDjmaIHBXg26oCNog13rfoow.6PvWhIoQ
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ BHC-GRP
+ server name TACACS_am-njio-ise-psn1
+ server name TACACS_am-sctio-ise-psn2
+ ip tacacs source-interface Loopback0
+!
+aaa authentication fail-message ^CYOUR ATTEMPT TO ACCESS THIS SYSTEM WAS REJECTED AND HAS BEEN LOGGED ^C
+aaa authentication login BHC group BHC-GRP local-case
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec BHC group BHC-GRP local if-authenticated 
+aaa authorization commands 0 BHC group BHC-GRP local if-authenticated 
+aaa authorization commands 1 BHC group BHC-GRP local if-authenticated 
+aaa authorization commands 7 BHC group BHC-GRP local if-authenticated 
+aaa authorization commands 15 BHC group BHC-GRP local if-authenticated 
+aaa authorization network default local 
+aaa accounting exec default start-stop group BHC-GRP
+aaa accounting commands 0 default start-stop group BHC-GRP
+aaa accounting commands 1 default start-stop group BHC-GRP
+aaa accounting commands 7 default start-stop group BHC-GRP
+aaa accounting commands 15 default start-stop group BHC-GRP
+!
+!
+!
+!
+!
+aaa session-id common
+!
+flow record LIVEACTION-FLOWRECORD
+ description DO NOT MODIFY. USED BY LIVEACTION.
+ match ipv4 tos
+ match ipv4 protocol
+ match ipv4 source address
+ match ipv4 destination address
+ match transport source-port
+ match transport destination-port
+ match interface input
+ match flow direction
+ collect routing source as
+ collect routing destination as
+ collect routing next-hop address ipv4
+ collect ipv4 dscp
+ collect ipv4 id
+ collect ipv4 source prefix
+ collect ipv4 source mask
+ collect ipv4 destination mask
+ collect transport tcp flags
+ collect interface output
+ collect flow sampler
+ collect counter bytes
+ collect counter packets
+ collect timestamp sys-uptime first
+ collect timestamp sys-uptime last
+ collect application name
+!
+!
+flow exporter LIVEACTION-FLOWEXPORTER
+ description DO NOT MODIFY. USED BY LIVEACTION.
+ destination 10.254.10.20
+ source Loopback0
+ transport udp 2055
+ option interface-table
+ option sampler-table
+ option application-table
+!
+!
+flow monitor LIVEACTION-FLOWMONITOR
+ description DO NOT MODIFY. USED BY LIVEACTION.
+ record LIVEACTION-FLOWRECORD
+ exporter LIVEACTION-FLOWEXPORTER
+ cache timeout inactive 10
+ cache timeout active 60
+ cache entries 200000
+!
+ip source-route
+!
+!
+!
+ip flow-cache timeout active 1
+no ip domain lookup
+ip name-server 10.240.183.66
+ip name-server 10.228.14.14
+ip name-server 10.228.14.21
+ip name-server 161.242.98.198
+ip name-server 161.242.98.200
+!
+!
+!
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-3292724315
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-3292724315
+ revocation-check none
+ rsakeypair TP-self-signed-3292724315
+!
+!
+crypto pki certificate chain TP-self-signed-3292724315
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 33323932 37323433 3135301E 170D3134 30383233 31313335 
+  31395A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D33 32393237 
+  32343331 3530819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281 
+  81009EDE 5539EFC9 5B649C3F 37B51F06 A8E851C1 1EA72D6E 470BC5DA E9A7DB01 
+  976AF1E4 57B4D829 651D2DE2 5C90ED77 B292DE3C F7E8BB9C 4EE99F5D C5BF662D 
+  7180EF42 23A254F3 8095A328 05C28CB6 96C00E24 3790D822 21734CB9 0C2E0B16 
+  B7EB3769 84CB344D A16F5A81 98BEBB1E 93B4BCA1 3070A9C0 6674C0F1 BB490620 
+  5EC30203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603 
+  551D2304 18301680 14436186 38BA5C1D E2ADDCB9 05871C08 3834CF81 60301D06 
+  03551D0E 04160414 43618638 BA5C1DE2 ADDCB905 871C0838 34CF8160 300D0609 
+  2A864886 F70D0101 05050003 81810066 4AE0905A 1C2E7F7E F8E7CF52 98378209 
+  ABDD26DC D70CB57A D73FF3D4 DC8C98B8 0AD95DE4 A0EB6671 1B402086 11F35489 
+  2B17973F 33FAE9C6 EE7DA706 8B6850A1 CC77F522 27174AFC D759794E BA79A199 
+  233B5C13 E07364CE 7B89A005 0968B6E2 61DB2B7D 51ABA6D7 CB9A8950 09DE7D14 
+  E60D8979 FF546E37 059150FC CABBA0
+  	quit
+!
+username admin privilege 15 password 7 045F5B085F356C42591E0C19
+username BHCAdmin privilege 15 secret 4 YWOnKzs43bu5FQnVBNFOiJafMgErvs1WGs.v.lKXL3U
+!
+redundancy
+ mode none
+!
+!
+!
+ip telnet source-interface Loopback0
+ip ssh source-interface Loopback0
+ip ssh logging events
+ip ssh version 2
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description -- MGMT --
+ ip address 172.25.10.4 255.255.255.255
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+!
+interface TenGigabitEthernet0/0/0
+ description -- 10G Copper Link to 7k-2, e3/9 --
+ ip address 172.25.10.72 255.255.255.254
+ ip nbar protocol-discovery
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ cdp enable
+!
+interface GigabitEthernet0/1/0
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet0/1/1
+ description DIA-Iron_Mountain-CID:dia.9f3cd88e.nje1-#2-1000MB
+ vrf forwarding internet
+ ip address 174.128.54.82 255.255.255.252
+ ip flow monitor LIVEACTION-FLOWMONITOR input
+ ip flow monitor LIVEACTION-FLOWMONITOR output
+ ip flow ingress
+ ip flow egress
+ load-interval 30
+ negotiation auto
+!
+interface GigabitEthernet0/1/2
+ description -- Internet VRF EXtended to 7K-2 --
+ vrf forwarding internet
+ ip address 74.114.184.227 255.255.255.240 secondary
+ ip address 174.128.54.102 255.255.255.240
+ standby 10 ip 174.128.54.100
+ standby 10 priority 150
+ standby 10 preempt
+ standby 20 ip 74.114.184.225
+ standby 20 priority 150
+ standby 20 preempt
+ load-interval 30
+ negotiation auto
+!
+interface GigabitEthernet0/1/3
+ description P2P-AUS_CenturyLink-CID:ETH1000-17081553-1000MB
+ ip address 172.20.132.82 255.255.255.252
+ shutdown
+ negotiation auto
+ cdp enable
+!
+interface GigabitEthernet0/1/4
+ description : 2nd P2P Link to SCD-iO
+ ip address 172.20.128.121 255.255.255.252
+ ip ospf 1 area 0
+ negotiation auto
+!
+interface GigabitEthernet0/1/5
+ description P2P(To Rochester)-LUMEN-CID:BCWZ4472-FRO2005547143-1000MB
+ ip address 172.20.128.238 255.255.255.252
+ ip nbar protocol-discovery
+ ip ospf 1 area 0
+ load-interval 30
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet0/1/6
+ description DIA-LUMEN-CID:ETH1000-22785760-BW:1000MB
+ vrf forwarding internet
+ ip address 65.153.14.246 255.255.255.252
+ ip nbar protocol-discovery
+ ip flow ingress
+ ip flow egress
+ load-interval 30
+ negotiation auto
+!
+interface GigabitEthernet0/1/7
+ no ip address
+ shutdown
+ negotiation auto
+ cdp enable
+!
+interface GigabitEthernet0/1/8
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet0/1/9
+ description -- Link to ASR-1 --
+ ip address 172.25.10.65 255.255.255.254
+ ip nbar protocol-discovery
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ negotiation auto
+ cdp enable
+!
+interface TenGigabitEthernet0/2/0
+ description -- 10G Copper Link to 7k-1, e4/9 --
+ ip address 172.25.10.70 255.255.255.254
+ ip nbar protocol-discovery
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ cdp enable
+!
+interface GigabitEthernet0
+ description Possible Bad Port
+ vrf forwarding Mgmt-intf
+ ip address 172.25.11.6 255.255.255.128
+ negotiation auto
+ cdp enable
+!
+interface GMPLS0
+ no ip address
+ no keepalive
+!
+router ospf 1
+ router-id 172.25.10.4
+ redistribute bgp 65001 subnets
+!
+router bgp 65001
+ template peer-policy FlexVPN-Policy
+  route-map FlexVPN-Prepend out
+  prefix-list BGP-OUT out
+  soft-reconfiguration inbound
+  maximum-prefix 3000 50 restart 30
+ exit-peer-policy
+ !
+ template peer-session FlexVPN-Session
+ exit-peer-session
+ !
+ bgp router-id 172.25.10.4
+ bgp log-neighbor-changes
+ neighbor 172.20.128.122 remote-as 65072
+ neighbor 172.20.128.122 description -- 1Gbit SCTIO-2 --
+ neighbor 172.20.128.122 shutdown
+ neighbor 172.20.128.237 remote-as 65100
+ neighbor 172.20.128.237 description AM-ROCHOC-R2
+ neighbor 172.25.10.3 remote-as 65001
+ neighbor 172.25.10.3 description -- ASR-1 --
+ neighbor 172.25.10.3 update-source Loopback0
+ neighbor 172.25.10.5 remote-as 65001
+ neighbor 172.25.10.5 description -- ISR-VPN --
+ neighbor 172.25.10.5 update-source Loopback0
+ neighbor 172.25.250.21 remote-as 65005
+ neighbor 172.25.250.21 description -- SCC-ASR p2p --
+ !
+ address-family ipv4
+  network 0.0.0.0 backdoor
+  network 10.0.0.0
+  network 10.0.0.0 mask 255.255.255.0
+  network 10.0.16.0 mask 255.255.255.0
+  network 10.0.16.21 mask 255.255.255.255
+  network 10.0.16.23 mask 255.255.255.255
+  network 10.0.24.0 mask 255.255.255.0
+  network 10.0.24.22 mask 255.255.255.255
+  network 10.0.24.23 mask 255.255.255.255
+  network 10.0.24.24 mask 255.255.255.255
+  network 10.0.24.25 mask 255.255.255.255
+  network 10.0.24.27 mask 255.255.255.255
+  network 10.0.24.28 mask 255.255.255.255
+  network 10.0.24.29 mask 255.255.255.255
+  network 10.0.24.31 mask 255.255.255.255
+  network 10.0.24.33 mask 255.255.255.255
+  network 10.0.24.34 mask 255.255.255.255
+  network 10.0.24.35 mask 255.255.255.255
+  network 10.0.24.39 mask 255.255.255.255
+  network 10.0.24.40 mask 255.255.255.255
+  network 10.0.24.41 mask 255.255.255.255
+  network 10.0.24.42 mask 255.255.255.255
+  network 10.0.24.43 mask 255.255.255.255
+  network 10.0.24.44 mask 255.255.255.255
+  network 10.0.24.45 mask 255.255.255.255
+  network 10.0.24.47 mask 255.255.255.255
+  network 10.0.24.48 mask 255.255.255.255
+  network 10.0.24.52 mask 255.255.255.255
+  network 10.0.24.54 mask 255.255.255.255
+  network 10.0.24.56 mask 255.255.255.255
+  network 10.0.24.57 mask 255.255.255.255
+  network 10.0.24.59 mask 255.255.255.255
+  network 10.0.24.61 mask 255.255.255.255
+  network 10.0.24.62 mask 255.255.255.255
+  network 10.0.24.65 mask 255.255.255.255
+  network 10.0.24.66 mask 255.255.255.255
+  network 10.0.24.67 mask 255.255.255.255
+  network 10.0.24.68 mask 255.255.255.255
+  network 10.0.24.72 mask 255.255.255.255
+  network 10.0.24.73 mask 255.255.255.255
+  network 10.0.24.74 mask 255.255.255.255
+  network 10.0.24.75 mask 255.255.255.255
+  network 10.0.24.76 mask 255.255.255.255
+  network 10.0.24.77 mask 255.255.255.255
+  network 10.0.24.78 mask 255.255.255.255
+  network 10.0.24.82 mask 255.255.255.255
+  network 10.0.24.83 mask 255.255.255.255
+  network 10.0.24.84 mask 255.255.255.255
+  network 10.0.24.86 mask 255.255.255.255
+  network 10.0.24.88 mask 255.255.255.255
+  network 10.0.24.90 mask 255.255.255.255
+  network 10.0.24.91 mask 255.255.255.255
+  network 10.0.24.92 mask 255.255.255.255
+  network 10.0.24.93 mask 255.255.255.255
+  network 10.0.24.97 mask 255.255.255.255
+  network 10.0.24.121 mask 255.255.255.255
+  network 10.0.24.122 mask 255.255.255.255
+  network 10.0.24.123 mask 255.255.255.255
+  network 10.0.24.124 mask 255.255.255.255
+  network 10.0.24.125 mask 255.255.255.255
+  network 10.0.24.126 mask 255.255.255.255
+  network 10.0.24.127 mask 255.255.255.255
+  network 10.0.24.128 mask 255.255.255.255
+  network 10.0.24.130 mask 255.255.255.255
+  network 10.0.25.0 mask 255.255.255.0
+  network 10.0.25.21 mask 255.255.255.255
+  network 10.0.25.22 mask 255.255.255.255
+  network 10.0.25.23 mask 255.255.255.255
+  network 10.0.25.24 mask 255.255.255.255
+  network 10.0.25.27 mask 255.255.255.255
+  network 10.0.25.33 mask 255.255.255.255
+  network 10.0.25.45 mask 255.255.255.255
+  network 10.0.25.46 mask 255.255.255.255
+  network 10.0.25.48 mask 255.255.255.255
+  network 10.0.25.51 mask 255.255.255.255
+  network 10.0.25.55 mask 255.255.255.255
+  network 10.0.25.56 mask 255.255.255.255
+  network 10.0.25.62 mask 255.255.255.255
+  network 10.0.25.63 mask 255.255.255.255
+  network 10.0.25.64 mask 255.255.255.255
+  network 10.0.26.0 mask 255.255.255.0
+  network 10.0.32.0 mask 255.255.255.0
+  network 10.0.33.0 mask 255.255.255.0
+  network 10.0.101.0 mask 255.255.255.0
+  network 10.0.102.0 mask 255.255.255.0
+  network 10.0.103.0 mask 255.255.255.0
+  network 10.0.104.0 mask 255.255.255.0
+  network 10.0.105.0 mask 255.255.255.0
+  network 10.0.112.0 mask 255.255.255.0
+  network 10.0.113.0 mask 255.255.255.0
+  network 10.0.114.0 mask 255.255.255.0
+  network 10.0.115.0 mask 255.255.255.0
+  network 10.0.116.0 mask 255.255.255.0
+  network 10.0.201.0 mask 255.255.255.0
+  network 10.0.202.0 mask 255.255.255.0
+  network 10.0.203.0 mask 255.255.255.0
+  network 10.0.204.0 mask 255.255.255.0
+  network 10.0.205.0 mask 255.255.255.0
+  network 10.0.208.0 mask 255.255.255.0
+  network 10.0.209.0 mask 255.255.255.0
+  network 10.0.210.0 mask 255.255.255.0
+  network 10.0.211.0 mask 255.255.255.0
+  network 10.0.212.0 mask 255.255.255.0
+  network 10.0.253.0 mask 255.255.255.0
+  network 10.1.2.0 mask 255.255.255.0
+  network 10.1.3.0 mask 255.255.255.0
+  network 10.1.3.18 mask 255.255.255.255
+  network 10.1.3.28 mask 255.255.255.255
+  network 10.1.3.39 mask 255.255.255.255
+  network 10.1.3.46 mask 255.255.255.255
+  network 10.1.3.56 mask 255.255.255.255
+  network 10.1.3.71 mask 255.255.255.255
+  network 10.1.3.72 mask 255.255.255.255
+  network 10.1.3.82 mask 255.255.255.255
+  network 10.1.3.91 mask 255.255.255.255
+  network 10.1.3.93 mask 255.255.255.255
+  network 10.1.3.96 mask 255.255.255.255
+  network 10.1.3.97 mask 255.255.255.255
+  network 10.1.3.98 mask 255.255.255.255
+  network 10.1.3.103 mask 255.255.255.255
+  network 10.1.3.116 mask 255.255.255.255
+  network 10.1.3.118 mask 255.255.255.255
+  network 10.1.7.73 mask 255.255.255.255
+  network 10.3.0.0 mask 255.255.255.0
+  network 10.3.0.5 mask 255.255.255.255
+  network 10.3.0.6 mask 255.255.255.255
+  network 10.3.0.19 mask 255.255.255.255
+  network 10.3.0.20 mask 255.255.255.255
+  network 10.3.0.23 mask 255.255.255.255
+  network 10.3.0.30 mask 255.255.255.255
+  network 10.3.0.31 mask 255.255.255.255
+  network 10.3.0.32 mask 255.255.255.255
+  network 10.3.0.33 mask 255.255.255.255
+  network 10.3.0.34 mask 255.255.255.255
+  network 10.3.0.36 mask 255.255.255.255
+  network 10.3.0.37 mask 255.255.255.255
+  network 10.3.0.40 mask 255.255.255.255
+  network 10.3.0.41 mask 255.255.255.255
+  network 10.3.0.150 mask 255.255.255.255
+  network 10.9.0.0 mask 255.255.0.0
+  network 10.9.64.0 mask 255.255.255.0
+  network 10.10.100.0 mask 255.255.255.0
+  network 10.11.64.0 mask 255.255.255.0
+  network 10.23.0.0 mask 255.255.0.0
+  network 10.24.0.0 mask 255.255.0.0
+  network 10.26.1.0 mask 255.255.255.0
+  network 10.26.4.0 mask 255.255.255.0
+  network 10.26.6.0 mask 255.255.255.0
+  network 10.26.6.144 mask 255.255.255.240
+  network 10.26.6.160 mask 255.255.255.224
+  network 10.26.6.192 mask 255.255.255.248
+  network 10.26.6.200 mask 255.255.255.248
+  network 10.26.6.208 mask 255.255.255.248
+  network 10.26.6.216 mask 255.255.255.248
+  network 10.26.6.224 mask 255.255.255.224
+  network 10.26.7.0 mask 255.255.255.0
+  network 10.26.7.0 mask 255.255.255.192
+  network 10.26.7.64 mask 255.255.255.192
+  network 10.26.7.115 mask 255.255.255.255
+  network 10.26.7.128 mask 255.255.255.224
+  network 10.26.7.160 mask 255.255.255.224
+  network 10.26.7.192 mask 255.255.255.224
+  network 10.26.7.224 mask 255.255.255.248
+  network 10.26.7.232 mask 255.255.255.248
+  network 10.26.8.0 mask 255.255.255.0
+  network 10.26.8.0 mask 255.255.255.224
+  network 10.26.9.0 mask 255.255.255.0
+  network 10.26.10.0 mask 255.255.255.0
+  network 10.43.15.0 mask 255.255.255.0
+  network 10.43.19.224 mask 255.255.255.224
+  network 10.43.21.0 mask 255.255.255.0
+  network 10.43.21.27 mask 255.255.255.255
+  network 10.43.21.28 mask 255.255.255.255
+  network 10.43.21.29 mask 255.255.255.255
+  network 10.43.21.30 mask 255.255.255.255
+  network 10.43.21.31 mask 255.255.255.255
+  network 10.43.21.32 mask 255.255.255.255
+  network 10.43.21.33 mask 255.255.255.255
+  network 10.43.21.42 mask 255.255.255.255
+  network 10.43.21.43 mask 255.255.255.255
+  network 10.43.22.0 mask 255.255.255.0
+  network 10.43.23.0 mask 255.255.255.0
+  network 10.43.67.0 mask 255.255.255.0
+  network 10.46.0.0 mask 255.255.0.0
+  network 10.47.153.128 mask 255.255.255.192
+  network 10.60.0.0 mask 255.255.0.0
+  network 10.80.2.0 mask 255.255.255.0
+  network 10.80.3.0 mask 255.255.255.0
+  network 10.99.99.0 mask 255.255.255.248
+  network 10.100.0.0 mask 255.255.0.0
+  network 10.100.98.0 mask 255.255.255.0
+  network 10.100.100.0 mask 255.255.255.0
+  network 10.100.101.0 mask 255.255.255.0
+  network 10.127.1.0 mask 255.255.255.0
+  network 10.127.2.0 mask 255.255.255.192
+  network 10.127.3.0 mask 255.255.255.0
+  network 10.140.38.74 mask 255.255.255.255
+  network 10.140.38.77 mask 255.255.255.255
+  network 10.140.44.0 mask 255.255.255.224
+  network 10.140.128.0 mask 255.255.192.0
+  network 10.140.132.192 mask 255.255.255.240
+  network 10.140.192.0 mask 255.255.192.0
+  network 10.174.0.0 mask 255.255.0.0
+  network 10.204.0.0 mask 255.254.0.0
+  network 10.206.0.0 mask 255.254.0.0
+  network 10.206.208.0 mask 255.255.252.0
+  network 10.208.0.0 mask 255.255.128.0
+  network 10.209.128.0 mask 255.255.192.0
+  network 10.228.0.0 mask 255.255.0.0
+  network 10.228.236.0 mask 255.255.252.0
+  network 10.231.224.0 mask 255.255.252.0
+  network 10.240.21.0 mask 255.255.255.0
+  network 10.240.100.0 mask 255.255.255.0
+  network 10.240.155.0 mask 255.255.255.0
+  network 10.240.158.0 mask 255.255.255.0
+  network 10.240.170.0 mask 255.255.255.0
+  network 10.240.255.0 mask 255.255.255.0
+  network 10.241.21.0 mask 255.255.255.0
+  network 10.241.22.0 mask 255.255.255.0
+  network 10.241.138.48 mask 255.255.255.240
+  network 10.241.155.0 mask 255.255.255.0
+  network 10.242.21.0 mask 255.255.255.0
+  network 10.242.155.0 mask 255.255.255.0
+  network 10.242.167.0 mask 255.255.255.0
+  network 10.243.21.0 mask 255.255.255.0
+  network 10.243.155.0 mask 255.255.255.0
+  network 10.252.0.0 mask 255.255.0.0
+  network 10.252.10.0 mask 255.255.255.0
+  network 10.252.64.128 mask 255.255.255.255
+  network 10.252.64.129 mask 255.255.255.255
+  network 10.252.64.137 mask 255.255.255.255
+  network 10.252.64.138 mask 255.255.255.255
+  network 10.252.64.188 mask 255.255.255.255
+  network 10.252.65.52 mask 255.255.255.255
+  network 10.252.65.53 mask 255.255.255.255
+  network 10.252.65.66 mask 255.255.255.255
+  network 10.252.65.67 mask 255.255.255.255
+  network 10.252.72.0 mask 255.255.255.0
+  network 10.252.73.0 mask 255.255.255.0
+  network 10.252.74.0 mask 255.255.255.0
+  network 10.252.75.0 mask 255.255.255.0
+  network 10.252.76.0 mask 255.255.255.0
+  network 10.252.77.0 mask 255.255.255.0
+  network 10.252.78.0 mask 255.255.255.0
+  network 10.252.103.0 mask 255.255.255.0
+  network 10.252.104.0 mask 255.255.248.0
+  network 10.253.104.0 mask 255.255.255.240
+  network 12.189.231.42 mask 255.255.255.255
+  network 20.129.3.0 mask 255.255.255.0
+  network 20.148.171.224 mask 255.255.255.248
+  network 64.209.231.96 mask 255.255.255.224
+  network 66.119.39.128 mask 255.255.255.192
+  network 98.141.207.26 mask 255.255.255.255
+  network 100.64.245.32 mask 255.255.255.224
+  network 161.242.55.0 mask 255.255.255.0
+  network 161.242.56.0 mask 255.255.255.0
+  network 161.242.56.202 mask 255.255.255.255
+  network 161.242.56.204 mask 255.255.255.255
+  network 161.242.56.205 mask 255.255.255.255
+  network 161.242.57.0 mask 255.255.255.0
+  network 161.242.57.20 mask 255.255.255.255
+  network 161.242.57.21 mask 255.255.255.255
+  network 161.242.57.66 mask 255.255.255.255
+  network 161.242.59.0 mask 255.255.255.0
+  network 161.242.59.0 mask 255.255.255.224
+  network 161.242.59.32 mask 255.255.255.224
+  network 161.242.59.128 mask 255.255.255.248
+  network 161.242.59.136 mask 255.255.255.248
+  network 161.242.67.0 mask 255.255.255.0
+  network 161.242.68.0 mask 255.255.255.0
+  network 161.242.68.13 mask 255.255.255.255
+  network 161.242.68.69 mask 255.255.255.255
+  network 161.242.68.81 mask 255.255.255.255
+  network 161.242.68.82 mask 255.255.255.255
+  network 161.242.68.96 mask 255.255.255.255
+  network 161.242.68.148 mask 255.255.255.255
+  network 161.242.68.149 mask 255.255.255.255
+  network 161.242.69.0 mask 255.255.255.0
+  network 161.242.69.30 mask 255.255.255.255
+  network 161.242.70.0 mask 255.255.255.0
+  network 161.242.71.0 mask 255.255.255.0
+  network 161.242.71.54 mask 255.255.255.255
+  network 161.242.71.55 mask 255.255.255.255
+  network 161.242.71.56 mask 255.255.255.255
+  network 161.242.71.57 mask 255.255.255.255
+  network 161.242.71.58 mask 255.255.255.255
+  network 161.242.71.74 mask 255.255.255.255
+  network 161.242.76.0 mask 255.255.255.0
+  network 161.242.84.0 mask 255.255.255.0
+  network 170.248.37.214 mask 255.255.255.255
+  network 172.20.123.0 mask 255.255.255.0
+  network 172.24.219.140 mask 255.255.255.252
+  network 172.25.10.0 mask 255.255.255.0
+  network 172.25.10.1 mask 255.255.255.255
+  network 172.25.10.2 mask 255.255.255.255
+  network 172.25.10.128 mask 255.255.255.248
+  network 172.25.10.240 mask 255.255.255.248
+  network 172.25.10.248 mask 255.255.255.248
+  network 172.25.11.0 mask 255.255.255.0
+  network 172.25.250.20 mask 255.255.255.252
+  network 180.211.68.94 mask 255.255.255.255
+  network 192.131.107.1 mask 255.255.255.255
+  network 192.131.107.2 mask 255.255.255.255
+  network 192.131.107.3 mask 255.255.255.255
+  network 192.131.107.4 mask 255.255.255.255
+  network 192.131.107.5 mask 255.255.255.255
+  network 192.168.5.0
+  network 192.168.168.0
+  network 192.168.173.0
+  network 192.168.177.0
+  network 192.168.200.46 mask 255.255.255.255
+  network 206.91.34.0
+  network 206.91.36.0
+  network 206.126.205.32 mask 255.255.255.224
+  network 206.251.249.50 mask 255.255.255.255
+  network 206.251.249.52 mask 255.255.255.255
+  network 206.251.249.100 mask 255.255.255.255
+  network 206.251.249.105 mask 255.255.255.255
+  network 206.251.249.106 mask 255.255.255.255
+  network 206.251.249.110 mask 255.255.255.255
+  network 209.191.134.0
+  network 216.74.163.0 mask 255.255.255.192
+  network 216.109.74.32 mask 255.255.255.240
+  neighbor 172.20.128.122 activate
+  neighbor 172.20.128.122 soft-reconfiguration inbound
+  neighbor 172.20.128.122 prefix-list Outbound out
+  neighbor 172.20.128.122 maximum-prefix 2000 50 restart 3
+  neighbor 172.20.128.237 activate
+  neighbor 172.20.128.237 send-community
+  neighbor 172.20.128.237 soft-reconfiguration inbound
+  neighbor 172.20.128.237 route-map RM-NJIO-TO-RDC-OUT out
+  neighbor 172.25.10.3 activate
+  neighbor 172.25.10.3 soft-reconfiguration inbound
+  neighbor 172.25.10.5 activate
+  neighbor 172.25.10.5 next-hop-self
+  neighbor 172.25.10.5 soft-reconfiguration inbound
+  neighbor 172.25.250.21 activate
+  neighbor 172.25.250.21 send-community
+  neighbor 172.25.250.21 default-originate
+  neighbor 172.25.250.21 soft-reconfiguration inbound
+  neighbor 172.25.250.21 prefix-list Inbound in
+ exit-address-family
+ !
+ address-family ipv4 vrf internet
+  network 74.114.184.0 mask 255.255.255.0
+  network 74.114.185.0 mask 255.255.255.0
+  neighbor 65.153.14.245 remote-as 209
+  neighbor 65.153.14.245 local-as 19888 no-prepend replace-as
+  neighbor 65.153.14.245 description -- CenturyLink --
+  neighbor 65.153.14.245 shutdown
+  neighbor 65.153.14.245 activate
+  neighbor 65.153.14.245 send-community both
+  neighbor 65.153.14.245 remove-private-as all replace-as
+  neighbor 65.153.14.245 soft-reconfiguration inbound
+  neighbor 65.153.14.245 route-map LUMEN-bgp-filter-in in
+  neighbor 65.153.14.245 route-map LUMEN-bgp-filter-out out
+  neighbor 174.128.54.81 remote-as 12025
+  neighbor 174.128.54.81 local-as 19888 no-prepend replace-as
+  neighbor 174.128.54.81 description -- ISP-2 --
+  neighbor 174.128.54.81 password 7 073901401D28173156
+  neighbor 174.128.54.81 activate
+  neighbor 174.128.54.81 remove-private-as all replace-as
+  neighbor 174.128.54.81 soft-reconfiguration inbound
+  neighbor 174.128.54.81 route-map IO-bgp-filter-in in
+  neighbor 174.128.54.81 route-map IO-bgp-filter-out out
+ exit-address-family
+!
+ip forward-protocol nd
+!
+ip bgp-community new-format
+ip flow-export source Loopback0
+ip flow-export version 9
+ip flow-export destination 161.242.68.146 2005
+no ip http server
+no ip http secure-server
+ip route 10.26.7.115 255.255.255.255 172.25.10.71 name FlexPD-Migration-Temp
+ip route 10.26.7.115 255.255.255.255 172.25.10.73 name FlexPD-Migration-Temp
+ip route 10.174.0.0 255.255.0.0 Null0 name Valeant_Summary
+ip route 10.228.0.0 255.255.0.0 Null0 name Valeant_Summary
+ip route 10.252.0.0 255.255.0.0 Null0 name EDS-Summary
+ip route 10.252.64.128 255.255.255.255 172.25.10.73 name DocumentumMigration-Temp
+ip route 10.252.64.129 255.255.255.255 172.25.10.73 name DocumentumMigration-Temp
+ip route 10.252.64.137 255.255.255.255 172.25.10.73 name ManugisticsMigration-Temp
+ip route 10.252.64.138 255.255.255.255 172.25.10.73 name ManugisticsMigration-Temp
+ip route 10.252.64.188 255.255.255.255 172.25.10.73 name Kintana
+ip route 10.252.65.52 255.255.255.255 172.25.10.73 name DocumentumMigration-Temp
+ip route 10.252.65.53 255.255.255.255 172.25.10.73 name DocumentumMigration-Temp
+ip route 10.252.65.66 255.255.255.255 172.25.10.73 name ManugisticsMigration-Temp
+ip route 10.252.65.67 255.255.255.255 172.25.10.73 name ManugisticsMigration-Temp
+ip route 161.242.56.202 255.255.255.255 172.25.10.73 name EMC-DataDomainMigration-Temp
+ip route 161.242.56.204 255.255.255.255 172.25.10.73 name Kintana
+ip route 161.242.56.205 255.255.255.255 172.25.10.73 name Kintana
+ip route 161.242.57.20 255.255.255.255 172.25.10.73 name ManugisticsMigration-Temp
+ip route 161.242.57.21 255.255.255.255 172.25.10.73 name ManugisticsMigration-Temp
+ip route 161.242.57.66 255.255.255.255 172.25.10.73 name Splunk
+ip route 161.242.68.13 255.255.255.255 172.25.10.73 name GEHC-NJIO-Migration-Temp
+ip route 161.242.68.69 255.255.255.255 172.25.10.73 name GEHC-NJIO-Migration-Temp
+ip route 161.242.68.81 255.255.255.255 172.25.10.73 name O365-Migration-Temp
+ip route 161.242.68.82 255.255.255.255 172.25.10.73 name O365-Migration-Temp
+ip route 161.242.68.96 255.255.255.255 172.25.10.73 name BackupReplication-Temp
+ip route 161.242.68.148 255.255.255.255 172.25.10.73 name SIEM
+ip route 161.242.68.149 255.255.255.255 172.25.10.73 name McAfee_ELM
+ip route 161.242.69.30 255.255.255.255 172.25.10.73 name GEHC-NJIO-Migration-Temp
+ip route 161.242.71.54 255.255.255.255 172.25.10.73 name EMC-DataDomainMigration-Temp
+ip route 161.242.71.55 255.255.255.255 172.25.10.73 name BackupReplication-Temp
+ip route 161.242.71.56 255.255.255.255 172.25.10.73 name BackupReplication-Temp
+ip route 161.242.71.57 255.255.255.255 172.25.10.73 name BackupReplication-Temp
+ip route 161.242.71.58 255.255.255.255 172.25.10.73 name BackupReplication-Temp
+ip route 161.242.71.74 255.255.255.255 172.25.10.73 name SIEMReplication-Temp
+ip route 172.25.10.0 255.255.255.0 Null0 name EDS-MGNT-AGG
+ip route 172.25.11.0 255.255.255.0 Null0 name EDS-MGNT-AGG-2
+ip route 174.128.54.96 255.255.255.240 Null0
+ip route vrf internet 0.0.0.0 0.0.0.0 74.114.184.226 254
+ip route vrf internet 20.60.229.161 255.255.255.255 65.153.14.245 name Azure-Cohesity_Replication
+ip route vrf internet 20.150.78.68 255.255.255.255 65.153.14.245 name Azure-Cohesity_Replication
+ip route vrf internet 74.114.184.0 255.255.255.0 74.114.184.228
+ip route vrf internet 74.114.184.254 255.255.255.255 74.114.184.232 name VPN_Tunnels
+ip route vrf internet 74.114.185.0 255.255.255.0 74.114.184.228
+ip tacacs source-interface Loopback0
+!
+ip access-list standard LUMEN_10
+ permit 68.177.240.0 0.0.0.255
+ip access-list standard VTY_ACCESS
+ remark TO RESTRICT VTY ACCESS
+ permit 10.0.0.0 0.255.255.255 log
+ permit 161.242.0.0 0.0.255.255 log
+ permit 68.177.240.0 0.0.0.15 log
+ permit 68.177.241.0 0.0.0.15 log
+ permit 172.16.0.0 0.15.255.255 log
+!
+!
+ip prefix-list CenturyLink_Outbound seq 1 permit 161.242.17.0/24
+ip prefix-list CenturyLink_Outbound seq 5 permit 161.242.76.0/24
+ip prefix-list CenturyLink_Outbound seq 10 permit 74.114.184.0/24
+ip prefix-list CenturyLink_Outbound seq 20 permit 74.114.185.0/24
+ip prefix-list CenturyLink_Outbound seq 999 deny 0.0.0.0/0 le 32
+!
+ip prefix-list Default-Only seq 10 permit 0.0.0.0/0
+!
+ip prefix-list DenyAll seq 1 deny 0.0.0.0/0 le 32
+!
+ip prefix-list EDS-MGNT seq 5 permit 172.25.10.0/24
+ip prefix-list EDS-MGNT seq 10 permit 172.25.11.0/24
+!
+ip prefix-list IO_Outbound seq 1 permit 161.242.59.0/24
+ip prefix-list IO_Outbound seq 2 permit 161.242.76.0/24
+ip prefix-list IO_Outbound seq 3 permit 174.128.54.96/28
+ip prefix-list IO_Outbound seq 4 permit 161.242.17.0/24
+ip prefix-list IO_Outbound seq 10 permit 74.114.184.0/24
+ip prefix-list IO_Outbound seq 20 permit 74.114.185.0/24
+ip prefix-list IO_Outbound seq 999 deny 0.0.0.0/0 le 32
+!
+ip prefix-list Inbound seq 1 permit 10.0.8.0/22 le 32
+ip prefix-list Inbound seq 2 permit 10.1.3.0/24
+ip prefix-list Inbound seq 3 permit 10.1.8.0/24 le 32
+ip prefix-list Inbound seq 4 permit 10.1.70.20/32
+ip prefix-list Inbound seq 5 permit 10.1.100.0/24 le 32
+ip prefix-list Inbound seq 6 permit 10.2.0.0/16 le 32
+ip prefix-list Inbound seq 7 permit 10.3.0.0/16 le 32
+ip prefix-list Inbound seq 8 permit 10.4.76.24/29
+ip prefix-list Inbound seq 9 permit 10.4.76.2/32
+ip prefix-list Inbound seq 10 permit 10.4.115.48/28
+ip prefix-list Inbound seq 11 permit 10.5.1.0/24 le 32
+ip prefix-list Inbound seq 12 permit 10.10.0.0/16 le 32
+ip prefix-list Inbound seq 13 permit 10.12.0.0/14 le 32
+ip prefix-list Inbound seq 14 permit 10.16.0.0/12 le 32
+ip prefix-list Inbound seq 15 permit 10.32.0.0/12 le 32
+ip prefix-list Inbound seq 16 permit 10.40.0.0/16 le 32
+ip prefix-list Inbound seq 17 permit 10.48.0.0/12 le 32
+ip prefix-list Inbound seq 18 permit 10.64.0.0/12 le 32
+ip prefix-list Inbound seq 19 permit 10.85.0.0/16 le 32
+ip prefix-list Inbound seq 20 permit 10.140.0.0/16 le 32
+ip prefix-list Inbound seq 21 permit 10.174.0.0/16 le 32
+ip prefix-list Inbound seq 22 permit 10.200.200.0/24 le 32
+ip prefix-list Inbound seq 23 permit 10.228.0.0/16 le 32
+ip prefix-list Inbound seq 24 permit 10.240.0.0/12 le 32
+ip prefix-list Inbound seq 25 permit 10.250.0.0/16 le 32
+ip prefix-list Inbound seq 26 permit 126.14.0.0/16
+ip prefix-list Inbound seq 27 permit 161.242.0.0/16 le 32
+ip prefix-list Inbound seq 28 permit 172.23.211.0/24 le 32
+ip prefix-list Inbound seq 29 permit 172.23.208.0/24 le 32
+ip prefix-list Inbound seq 30 permit 172.23.209.0/24 le 32
+ip prefix-list Inbound seq 31 permit 172.23.210.0/24
+ip prefix-list Inbound seq 32 permit 172.24.219.0/24 le 32
+ip prefix-list Inbound seq 33 permit 172.25.0.0/16 le 24
+ip prefix-list Inbound seq 34 permit 192.168.7.0/24
+ip prefix-list Inbound seq 35 permit 192.168.252.0/22
+ip prefix-list Inbound seq 36 permit 172.25.2.0/24
+ip prefix-list Inbound seq 37 permit 10.243.142.0/24
+ip prefix-list Inbound seq 999 deny 0.0.0.0/32
+!
+ip prefix-list Outbound seq 1 permit 10.252.0.0/16 le 32
+ip prefix-list Outbound seq 2 permit 161.242.55.0/24
+ip prefix-list Outbound seq 3 permit 161.242.56.0/24
+ip prefix-list Outbound seq 4 permit 161.242.57.0/24
+ip prefix-list Outbound seq 5 permit 161.242.68.0/24
+ip prefix-list Outbound seq 6 permit 161.242.69.0/24
+ip prefix-list Outbound seq 7 permit 161.242.70.0/24
+ip prefix-list Outbound seq 8 permit 161.242.71.0/24
+ip prefix-list Outbound seq 9 permit 172.25.10.0/24 le 32
+ip prefix-list Outbound seq 10 permit 172.25.11.0/24 le 32
+!
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 10 permit 10.252.0.0/16
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 11 permit 161.242.68.69/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 12 permit 161.242.68.13/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 13 permit 161.242.69.30/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 14 permit 161.242.68.81/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 15 permit 161.242.68.82/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 16 permit 10.26.7.115/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 20 permit 192.168.220.0/22
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 21 permit 161.242.71.54/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 22 permit 161.242.71.55/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 23 permit 161.242.71.56/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 24 permit 161.242.71.57/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 25 permit 161.242.71.58/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 26 permit 161.242.68.96/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 27 permit 161.242.71.74/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 28 permit 10.252.64.128/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 29 permit 10.252.64.129/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 30 permit 10.252.65.52/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 31 permit 10.252.65.53/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 32 permit 161.242.69.50/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 34 permit 10.252.64.137/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 35 permit 10.252.64.138/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 36 permit 10.252.65.66/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 37 permit 10.252.65.67/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 39 permit 161.242.56.202/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 40 permit 161.242.57.20/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 41 permit 161.242.57.21/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 42 permit 161.242.68.149/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 43 permit 161.242.56.204/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 44 permit 161.242.56.205/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 45 permit 161.242.68.148/32
+ip prefix-list PFL-NJIO-TO-RDC-OUT seq 100 deny 0.0.0.0/0 le 32
+!
+ip prefix-list prefix-list-dendreon-ric-inbound seq 1 deny 10.228.0.0/16
+ip prefix-list prefix-list-dendreon-ric-inbound seq 2 deny 10.1.8.0/24
+ip prefix-list prefix-list-dendreon-ric-inbound seq 3 deny 172.18.1.0/24
+ip prefix-list prefix-list-dendreon-ric-inbound seq 5 deny 10.0.1.0/24
+ip prefix-list prefix-list-dendreon-ric-inbound seq 10 permit 0.0.0.0/0 le 32
+!
+ip prefix-list prefix-list-dendreon-ric-outbound seq 10 permit 161.242.59.0/24
+ip prefix-list prefix-list-dendreon-ric-outbound seq 15 deny 10.0.1.0/24
+ip prefix-list prefix-list-dendreon-ric-outbound seq 20 permit 0.0.0.0/0 le 32
+logging esm config
+access-list 22 remark -- SNMP-ACCESS --
+access-list 22 permit 10.0.0.0 0.255.255.255
+access-list 22 permit 172.25.0.0 0.0.255.255
+access-list 22 permit 161.242.0.0 0.0.255.255
+access-list 23 remark --LiveAction-SNMP-ACCESS--
+access-list 23 permit 161.242.218.59
+access-list 23 permit 10.252.40.60
+access-list 23 permit 10.254.10.20
+access-list 122 remark -- VTY-ACCESS --
+access-list 122 permit tcp 10.0.0.0 0.255.255.255 any eq 22
+access-list 122 permit tcp 172.25.0.0 0.0.255.255 any eq 22
+access-list 122 permit tcp 161.242.0.0 0.0.255.255 any eq 22
+access-list 122 permit tcp 10.0.0.0 0.255.255.255 any eq telnet
+access-list 122 permit tcp 172.25.0.0 0.0.255.255 any eq telnet
+access-list 122 permit tcp 10.240.0.0 0.0.255.255 any eq 22
+access-list 122 permit tcp 10.252.0.0 0.0.255.255 any eq 22
+access-list 122 permit tcp 10.254.0.0 0.0.255.255 any eq 22
+access-list 122 permit tcp 10.248.0.0 0.1.255.255 any eq 22
+cdp run
+!
+route-map LUMEN-bgp-filter-in permit 10
+ match ip address prefix-list Default-Only
+ set local-preference 90
+ set community no-export
+!
+route-map FlexVPN-Prepend permit 10
+ set as-path prepend 65001 65001 65001 65001
+!
+route-map route-map-dendreon-ric-inbound permit 10
+ match ip address prefix-list prefix-list-dendreon-ric-inbound
+!
+route-map RM-NJIO-TO-RDC-OUT permit 10
+ match ip address prefix-list PFL-NJIO-TO-RDC-OUT
+!
+route-map CENTURYLINK-OUT deny 5
+ description -- DENY-ALL-UNTIL-DESIGNED --
+!
+route-map IO-bgp-filter-out permit 10
+ match ip address prefix-list IO_Outbound
+!
+route-map IO-bgp-filter-in permit 10
+ match ip address prefix-list Default-Only
+ set community no-export
+!
+route-map NJIO-OUT permit 1
+ description -- NJIO-OUT to SCT-IO --
+ match ip address prefix-list EDS-MGNT
+!
+route-map NJIO-OUT deny 2
+ description -- DENY-ALL-UNTIL-DESIGNED --
+!
+route-map CENTURYLINK-IN deny 5
+ description -- DENY-ALL-UNTIL-DESINED 
+!
+route-map LUMEN-bgp-filter-out permit 10
+ match ip address prefix-list CenturyLink_Outbound
+ set as-path prepend 19888 19888 19888 19888
+ set community 209:70
+!
+route-map route-map-dendreon-ric-outbound permit 10
+ match ip address prefix-list prefix-list-dendreon-ric-outbound
+!
+snmp-server community tasTesGreat RO
+snmp-server community les$Filling RW 23
+snmp-server community C0ll3ctMe$ RO 22
+snmp-server community bZyrH94$@! RO LUMEN_10
+snmp-server trap-source Loopback0
+snmp-server source-interface informs Loopback0
+snmp-server packetsize 8192
+snmp-server location NJ-IO Data Center, Edison, NJ 08837
+snmp-server contact noc@valeant.com +1.855.891.1604
+snmp ifmib ifindex persist
+!
+tacacs server TACACS_am-njio-ise-psn1
+ address ipv4 161.242.71.121
+ key 7 112B31265A260A0F2509186923362C63
+tacacs server TACACS_am-sctio-ise-psn2
+ address ipv4 161.242.87.121
+ key 7 072D096F033D1806363138410F2F3265
+!
+!
+control-plane
+!
+!
+!
+!
+sip-ua 
+!
+banner motd ^Cc
+***********************************************************************
+**                                                                   **
+**            Edison, NJ IO Data Center, - AM-EDS-A06-R01            **
+**                                                                   **
+***********************************************************************
+**      THIS SYSTEM IS RESTRICTED TO AUTHORIZED USERS ONLY.          **
+**    INDIVIDUALS ATTEMPTING UNAUTHORIZED ACCESS MAY BE SUBJECT      **
+**    TO DISCIPLINARY ACTION UP TO AND INCLUDING TERMINATION         **
+**    AND/OR CIVIL OR CRIMINAL PROSECUTION.                          **
+**                                                                   **
+**             IF UNAUTHORIZED, TERMINATE ACCESS NOW!                **
+***********************************************************************
+**           Report problems by dialing +1.855.891.1604              **
+**                 noc@valeant.com noc@bausch.com                    **
+***********************************************************************
+^C
+alias exec si sho ip int brie
+alias exec c config t
+alias exec cdp show cdp neigh
+alias exec sion sh ip ospf neigh
+alias exec b sh ip bgp
+alias exec bs sh ip bgp summ
+alias exec sir sh ip route
+!
+line con 0
+ session-timeout 5 
+ exec-timeout 15 0
+ password 7 0340681E165D731A
+ logging synchronous
+ login authentication BHC
+ stopbits 1
+line vty 0 4
+ session-timeout 30 
+ access-class VTY_ACCESS in
+ exec-timeout 30 0
+ privilege level 15
+ password 7 030F5E0E165F3458
+ authorization commands 0 BHC
+ authorization commands 1 BHC
+ authorization commands 7 BHC
+ authorization commands 15 BHC
+ authorization exec BHC
+ logging synchronous
+ login authentication BHC
+ transport preferred none
+ transport input ssh
+ transport output telnet ssh
+line vty 5 15
+ session-timeout 30 
+ access-class VTY_ACCESS in
+ exec-timeout 30 0
+ password 7 030F5E0E165F3458
+ authorization commands 0 BHC
+ authorization commands 1 BHC
+ authorization commands 7 BHC
+ authorization commands 15 BHC
+ authorization exec BHC
+ logging synchronous
+ login authentication BHC
+ transport input ssh
+!
+ntp source Loopback0
+ntp server 172.25.8.1
+ntp server 161.242.71.8 prefer
+end
+
+sh int status
+                          ^
+% Invalid input detected at '^' marker.
+
+sh ip int bri
+Interface              IP-Address      OK? Method Status                Protocol
+Te0/0/0                172.25.10.72    YES NVRAM  down                  down    
+GigabitEthernet0/1/0   unassigned      YES NVRAM  administratively down down    
+GigabitEthernet0/1/1   174.128.54.82   YES NVRAM  up                    up      
+GigabitEthernet0/1/2   174.128.54.102  YES NVRAM  up                    up      
+GigabitEthernet0/1/3   172.20.132.82   YES NVRAM  administratively down down    
+GigabitEthernet0/1/4   172.20.128.121  YES NVRAM  down                  down    
+GigabitEthernet0/1/5   172.20.128.238  YES NVRAM  administratively down down    
+GigabitEthernet0/1/6   65.153.14.246   YES NVRAM  up                    up      
+GigabitEthernet0/1/7   unassigned      YES NVRAM  administratively down down    
+GigabitEthernet0/1/8   unassigned      YES NVRAM  administratively down down    
+GigabitEthernet0/1/9   172.25.10.65    YES NVRAM  up                    up      
+Te0/2/0                172.25.10.70    YES NVRAM  up                    up      
+GigabitEthernet0       172.25.11.6     YES manual up                    up      
+GMPLS0                 unassigned      YES unset  up                    up      
+Loopback0              172.25.10.4     YES NVRAM  up                    up      
+sh vlan
+% Incomplete command.
+
+sh ver
+Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-ADVIPSERVICESK9-M), Version 15.1(2)S, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2011 by Cisco Systems, Inc.
+Compiled Thu 24-Mar-11 23:49 by mcpre
+
+
+Cisco IOS-XE software, Copyright (c) 2005-2011 by cisco Systems, Inc.
+All rights reserved.  Certain components of Cisco IOS-XE software are
+licensed under the GNU General Public License ("GPL") Version 2.0.  The
+software code licensed under GPL Version 2.0 is free software that comes
+with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+GPL code under the terms of GPL Version 2.0.  For more details, see the
+documentation or "License Notice" file accompanying the IOS-XE software,
+or the applicable URL provided on the flyer accompanying the IOS-XE
+software.
+
+
+ROM: IOS-XE ROMMON
+
+AM-EDS-A08-R02 uptime is 16 weeks, 6 days, 18 hours, 29 minutes
+Uptime for this control processor is 16 weeks, 6 days, 18 hours, 31 minutes
+System returned to ROM by reload at 10:36:18 UTC Mon Dec 18 2017
+System restarted at 15:39:38 UTC Sat Jan 27 2024
+System image file is "bootflash:/asr1000rp2-advipservicesk9.03.03.00.S.151-2.S.bin"
+Last reload reason: PowerOn
+
+
+
+This product contains cryptographic features and is subject to United
+States and local country laws governing import, export, transfer and
+use. Delivery of Cisco cryptographic products does not imply
+third-party authority to import, export, distribute or use encryption.
+Importers, exporters, distributors and users are responsible for
+compliance with U.S. and local country laws. By using this product you
+agree to comply with applicable laws and regulations. If you are unable
+to comply with U.S. and local laws, return this product immediately.
+
+A summary of U.S. laws governing Cisco cryptographic products may be found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to
+export@cisco.com.
+
+cisco ASR1004 (RP2) processor with 4273015K/6147K bytes of memory.
+10 Gigabit Ethernet interfaces
+2 Ten Gigabit Ethernet interfaces
+32768K bytes of non-volatile configuration memory.
+8388608K bytes of physical memory.
+1925119K bytes of eUSB flash at bootflash:.
+78085207K bytes of SATA hard disk at harddisk:.
+
+Configuration register is 0x2102
+
+sh inventory
+NAME: "Chassis", DESCR: "Cisco ASR1004 Chassis"
+PID: ASR1004           , VID: V02, SN: FOX1537GFW3
+
+NAME: "module 0", DESCR: "Cisco ASR1000 SPA Interface Processor 10"
+PID: ASR1000-SIP10     , VID: V08, SN: JAE153903ZS
+
+NAME: "SPA subslot 0/0", DESCR: "1-port 10 Gigabit Ethernet Shared Port Adapter XFP based"
+PID: SPA-1X10GE-L-V2   , VID: V02, SN: SAL1531L8FA
+
+NAME: "subslot 0/0 transceiver 0", DESCR: "10GBASE-SR/SW"
+PID: XFP-10G-MM-SR       , VID: 02 , SN: ONT153610HZ     
+
+NAME: "SPA subslot 0/1", DESCR: "10-port Gigabit Ethernet Shared Port Adapter"
+PID: SPA-10X1GE-V2     , VID: V02, SN: JAE153506S6
+
+NAME: "subslot 0/1 transceiver 0", DESCR: "GE SX"
+PID: SFP-GE-S            , VID: 06  , SN: AGM1537P03T     
+
+NAME: "subslot 0/1 transceiver 1", DESCR: "GE SX"
+PID: N/A                 , VID:     , SN: AGM13491J9X     
+
+NAME: "subslot 0/1 transceiver 2", DESCR: "GE T"
+PID: N/A                 , VID: F   , SN: 00000MTC153901D6
+
+NAME: "subslot 0/1 transceiver 3", DESCR: "GE LX"
+PID: N/A                 , VID: B1  , SN: TRILX00024      
+
+NAME: "subslot 0/1 transceiver 4", DESCR: "GE SX"
+PID: N/A                 , VID:     , SN: AGA1532L064     
+
+NAME: "subslot 0/1 transceiver 5", DESCR: "GE SX"
+PID: N/A                 , VID:     , SN: AGA1532L078     
+
+NAME: "subslot 0/1 transceiver 6", DESCR: "GE LX"
+PID: N/A                 , VID:     , SN: AGS0932A1J6     
+
+NAME: "subslot 0/1 transceiver 7", DESCR: "GE SX"
+PID: N/A                 , VID:     , SN: AGM14131F1T     
+
+NAME: "subslot 0/1 transceiver 9", DESCR: "GE T"
+PID: N/A                 , VID: F   , SN: 00000MTC153901LS
+
+NAME: "SPA subslot 0/2", DESCR: "1-port 10 Gigabit Ethernet Shared Port Adapter XFP based"
+PID: SPA-1X10GE-L-V2   , VID: V02, SN: SAL1531L8DL
+
+NAME: "subslot 0/2 transceiver 0", DESCR: "10GBASE-SR/SW"
+PID: XFP-10G-MM-SR       , VID: 02 , SN: ONT153610J0     
+
+NAME: "module R0", DESCR: "Cisco ASR1000 Route Processor 2"
+PID: ASR1000-RP2       , VID: V02, SN: JAE154202KL
+
+NAME: "module F0", DESCR: "Cisco ASR1000 Embedded Services Processor, 10Gbps"
+PID: ASR1000-ESP10     , VID: V05, SN: JAE154104FH
+
+NAME: "Power Supply Module 0", DESCR: "Cisco ASR1004 AC Power Supply"
+PID: ASR1004-PWR-AC    , VID: V02, SN: ART1535K026
+
+NAME: "Power Supply Module 1", DESCR: "Cisco ASR1004 AC Power Supply"
+PID: ASR1004-PWR-AC    , VID: V02, SN: ART1535K025
+
+
+sh mod
+% Incomplete command.
+
+sh mac address-table
+                    ^
+% Invalid input detected at '^' marker.
+
+sh arp
+Protocol  Address          Age (min)  Hardware Addr   Type   Interface
+Internet  172.20.128.121          -   649e.f34d.c514  ARPA   GigabitEthernet0/1/4
+Internet  172.25.10.64           11   649e.f34d.c119  ARPA   GigabitEthernet0/1/9
+Internet  172.25.10.65            -   649e.f34d.c519  ARPA   GigabitEthernet0/1/9
+Internet  172.25.10.70            -   649e.f34d.c520  ARPA   TenGigabitEthernet0/2/0
+Internet  172.25.10.71           17   4055.3926.9a42  ARPA   TenGigabitEthernet0/2/0
+Internet  172.25.10.72            -   649e.f34d.c500  ARPA   TenGigabitEthernet0/0/0
+sh cdp neighbors
+Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
+                  S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone, 
+                  D - Remote, C - CVTA, M - Two-port Mac Relay 
+
+Device ID        Local Intrfce     Holdtme    Capability  Platform  Port ID
+AM-EDS-A06N7KCAG-1(JAF1532ALHP)
+                 Ten 0/2/0         132             R S C  N7K-C7010 Eth 4/9
+AM-EDS-A09C3K-S02
+                 Gig 0             173              S I   WS-C3750X Gig 1/0/14
+AM-EDS-A05-R01   Gig 0/1/9         176              R I   ASR1004   Gig 0/1/9
+sh ip protocols
+*** IP Routing is NSF aware ***
+
+Routing Protocol is "ospf 1"
+  Outgoing update filter list for all interfaces is not set
+  Incoming update filter list for all interfaces is not set
+  Router ID 172.25.10.4
+  It is an autonomous system boundary router
+ Redistributing External Routes from,
+    bgp 65001, includes subnets in redistribution
+  Number of areas in this router is 1. 1 normal 0 stub 0 nssa
+  Maximum path: 4
+  Routing for Networks:
+  Routing on Interfaces Configured Explicitly (Area 0):
+    Loopback0
+    TenGigabitEthernet0/2/0
+    GigabitEthernet0/1/9
+    GigabitEthernet0/1/5
+    GigabitEthernet0/1/4
+    TenGigabitEthernet0/0/0
+  Routing Information Sources:
+    Gateway         Distance      Last Update
+    172.25.10.245        110      2w1d
+    172.25.10.5          110      8w3d
+    172.25.10.3          110      00:00:31
+    172.25.10.2          110      16w6d
+    172.25.10.1          110      16w6d
+    172.25.11.1          110      16w6d
+    172.25.10.124        110      16w6d
+    172.25.10.122        110      16w6d
+  Distance: (default is 110)
+
+Routing Protocol is "bgp 65001"
+  Outgoing update filter list for all interfaces is not set
+  Incoming update filter list for all interfaces is not set
+  IGP synchronization is disabled
+  Automatic route summarization is disabled
+  Neighbor(s):
+    Address          FiltIn FiltOut DistIn DistOut Weight RouteMap
+    172.20.128.122                                       
+    172.20.128.237                                       
+    172.25.10.3                                          
+    172.25.10.5                                          
+    172.25.250.21                                        
+  Maximum path: 1
+  Routing Information Sources:
+    Gateway         Distance      Last Update
+    172.25.10.5          200      8w3d
+    172.25.10.3          200      00:00:31
+  Distance: external 20 internal 200 local 200
+
+sh ip route
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+       + - replicated route, % - next hop override
+
+Gateway of last resort is 172.25.10.71 to network 0.0.0.0
+
+O*E2  0.0.0.0/0 [110/1] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+      4.0.0.0/31 is subnetted, 4 subnets
+O E2     4.74.191.28 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     4.74.223.20 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     4.74.223.22 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     4.74.254.28 [110/1] via 172.25.10.64, 2w1d, GigabitEthernet0/1/9
+      8.0.0.0/32 is subnetted, 1 subnets
+O E2     8.192.1.95 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      10.0.0.0/8 is variably subnetted, 777 subnets, 20 masks
+O E2     10.0.0.0/8 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E1     10.0.0.0/23 [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     10.0.1.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.0.1.0/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.0.2.0/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.0.3.0/24 [110/1] via 172.25.10.64, 00:00:01, GigabitEthernet0/1/9
+O E2     10.0.5.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.0.8.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E1     10.0.16.21/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.16.33/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.22/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.23/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.24/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.25/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.27/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.28/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.29/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.31/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.33/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.34/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.35/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.39/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.40/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.41/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.42/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.43/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.44/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.45/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.47/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.48/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.52/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.54/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.56/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.57/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.59/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.61/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.62/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.65/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.66/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.67/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.68/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.72/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.73/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.74/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.75/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.76/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.77/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.78/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.82/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.83/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.84/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.86/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.88/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.90/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.91/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.92/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.93/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.97/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.121/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.122/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.123/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.124/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.125/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.126/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.127/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.128/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.24.130/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.21/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.22/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.23/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.24/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.27/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.33/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.45/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.46/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.48/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.51/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.55/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.56/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.62/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.63/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.64/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.0.25.65/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     10.1.0.0/16 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.1.0.0/20 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E1     10.1.3.18/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.28/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.39/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.46/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.56/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.71/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.72/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.82/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.91/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.93/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.96/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.97/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.98/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.103/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.116/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.3.118/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.1.7.73/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     10.1.70.10/32 [110/1] via 172.25.10.64, 1d19h, GigabitEthernet0/1/9
+O E2     10.1.70.20/32 [110/1] via 172.25.10.64, 1d19h, GigabitEthernet0/1/9
+O E2     10.1.70.22/32 [110/1] via 172.25.10.64, 1d19h, GigabitEthernet0/1/9
+O E2     10.1.79.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.1.100.0/24 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.2.0.0/16 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.2.9.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.2.202.128/25 [110/1] via 172.25.10.64, 1d19h, GigabitEthernet0/1/9
+O E1     10.3.0.5/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.3.0.6/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.3.0.19/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.3.0.20/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.3.0.23/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.3.0.30/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.3.0.31/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.3.0.32/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.3.0.33/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.3.0.34/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.3.0.36/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.3.0.37/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.3.0.40/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.3.0.41/32 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.3.0.150/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     10.3.1.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.3.100.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.4.12.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.4.73.0/24 [110/1] via 172.25.10.64, 1d19h, GigabitEthernet0/1/9
+O E2     10.4.76.0/24 [110/1] via 172.25.10.64, 1d19h, GigabitEthernet0/1/9
+O E2     10.4.115.0/24 [110/1] via 172.25.10.64, 1d19h, GigabitEthernet0/1/9
+O E2     10.4.214.0/25 [110/1] via 172.25.10.64, 1d19h, GigabitEthernet0/1/9
+O E2     10.6.235.207/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.6.235.208/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.10.0.0/16 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.10.10.13/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.10.10.14/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.10.10.15/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.11.11.8/29 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     10.14.118.14/32 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.14.125.50/32 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.16.0.0/16 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.16.80.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.16.216.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.18.0.0/16 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.23.58.228/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+S        10.26.7.115/32 [1/0] via 172.25.10.73
+                        [1/0] via 172.25.10.71
+O E2     10.33.4.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.33.10.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.33.11.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.33.12.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.33.13.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.33.14.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.33.15.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.35.1.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.35.3.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.35.98.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.35.99.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.0.254/32 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.1.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.3.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.4.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.6.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.10.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.12.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.13.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.14.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.15.0/27 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.15.32/27 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.15.64/27 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.19.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.87.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.88.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.90.0/27 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.90.32/27 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.90.64/27 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.36.90.96/27 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.43.9.0/24 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.43.15.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.64.60.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.74.2.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.77.0.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.100.0.0/16 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.100.0.0/22 [110/1] via 172.25.10.64, 1w2d, GigabitEthernet0/1/9
+O E2     10.100.4.0/22 [110/1] via 172.25.10.64, 1w2d, GigabitEthernet0/1/9
+O E2     10.108.0.0/18 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.108.64.0/18 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.108.128.0/18 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.108.192.0/18 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.109.0.0/18 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.109.64.0/18 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.109.128.0/18 [110/1] via 172.25.10.64, 1w2d, GigabitEthernet0/1/9
+O E1     10.111.254.0/24 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     10.111.255.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.112.0.0/18 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.112.64.0/18 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.112.128.0/18 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.112.192.0/18 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.115.255.0/24 [110/1] via 172.25.10.64, 2w4d, GigabitEthernet0/1/9
+O E2     10.125.18.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.127.2.0/26 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E1     10.127.2.128/26 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.127.3.0/24 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     10.131.208.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.139.168.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.144.128.0/17 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.144.128.0/22 [110/1] via 172.25.10.64, 5d00h, GigabitEthernet0/1/9
+O E2     10.144.144.0/20 [110/1] via 172.25.10.64, 2w4d, GigabitEthernet0/1/9
+O E2     10.144.160.0/20 [110/1] via 172.25.10.64, 2d02h, GigabitEthernet0/1/9
+O E2     10.144.176.0/20 [110/1] via 172.25.10.64, 3d23h, GigabitEthernet0/1/9
+O E2     10.150.50.0/24 [110/1] via 172.25.10.64, 1w0d, GigabitEthernet0/1/9
+O E2     10.150.50.64/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.150.50.96/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.150.50.136/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.150.50.140/30 
+           [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.150.50.200/29 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.150.50.208/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+S        10.174.0.0/16 is directly connected, Null0
+O E2     10.174.0.0/17 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.174.3.0/24 [110/1] via 172.25.10.64, 1d11h, GigabitEthernet0/1/9
+O E2     10.174.4.0/24 [110/1] via 172.25.10.64, 1d11h, GigabitEthernet0/1/9
+O E2     10.174.5.0/24 [110/1] via 172.25.10.64, 1d11h, GigabitEthernet0/1/9
+O E2     10.174.17.0/24 [110/1] via 172.25.10.64, 1d11h, GigabitEthernet0/1/9
+O E2     10.174.18.0/26 [110/1] via 172.25.10.64, 1d11h, GigabitEthernet0/1/9
+O E2     10.174.19.0/25 [110/1] via 172.25.10.64, 1d11h, GigabitEthernet0/1/9
+O E2     10.174.21.0/24 [110/1] via 172.25.10.64, 1d11h, GigabitEthernet0/1/9
+O E2     10.174.36.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.40.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.56.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.64.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.68.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.72.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.92.0/24 
+           [110/1] via 172.25.10.64, 15:43:22, GigabitEthernet0/1/9
+O E2     10.174.93.0/24 
+           [110/1] via 172.25.10.64, 15:24:06, GigabitEthernet0/1/9
+O E2     10.174.95.0/24 
+           [110/1] via 172.25.10.64, 15:24:06, GigabitEthernet0/1/9
+O E2     10.174.100.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.104.0/24 
+           [110/1] via 172.25.10.64, 21:53:52, GigabitEthernet0/1/9
+O E2     10.174.105.0/24 
+           [110/1] via 172.25.10.64, 21:53:52, GigabitEthernet0/1/9
+O E2     10.174.107.0/24 
+           [110/1] via 172.25.10.64, 21:53:52, GigabitEthernet0/1/9
+O E2     10.174.120.0/22 [110/1] via 172.25.10.64, 2w1d, GigabitEthernet0/1/9
+O E2     10.174.128.0/20 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.148.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.152.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.160.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.164.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.168.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.172.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.176.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.177.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.178.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.179.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.180.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.174.200.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.178.0.0/19 [110/1] via 172.25.10.64, 1w0d, GigabitEthernet0/1/9
+O E1     10.178.80.0/20 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     10.179.0.0/20 [110/1] via 172.25.10.64, 1w2d, GigabitEthernet0/1/9
+O E2     10.184.0.0/16 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.185.176.0/20 [110/1] via 172.25.10.64, 2w4d, GigabitEthernet0/1/9
+O E2     10.195.6.176/29 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E1     10.211.1.61/32 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.212.247.27/32 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     10.220.0.0/24 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.222.3.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+S        10.228.0.0/16 is directly connected, Null0
+O E2     10.228.47.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.228.50.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.228.52.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.228.53.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.228.54.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.228.100.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.101.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.103.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.108.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.111.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.112.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.113.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.114.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.115.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.116.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.117.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.118.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.119.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.120.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.121.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.122.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.123.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.124.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.124.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.125.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.126.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.127.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.128.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.128.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.136.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.138.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.139.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.140.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.141.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.142.8/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.142.16/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.143.0/26 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.144.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.145.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.148.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.168.0/22 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.228.172.0/24 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     10.228.173.0/24 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     10.228.175.0/24 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     10.228.176.0/20 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.228.192.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.194.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.195.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.196.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.200.0/21 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.228.201.0/24 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.228.208.0/22 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.228.212.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.213.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.214.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.215.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.216.0/22 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.228.220.0/22 [110/1] via 172.25.10.64, 1w2d, GigabitEthernet0/1/9
+O E2     10.228.224.0/22 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.228.240.0/22 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.228.244.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.228.250.0/24 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.228.251.0/24 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.228.252.0/24 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.233.36.244/32 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.233.36.245/32 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.233.36.246/32 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.233.36.247/32 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.233.36.248/32 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.233.36.249/32 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.233.36.250/32 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.233.40.48/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.233.157.52/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.233.157.62/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.235.0.0/26 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.235.0.64/27 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.235.0.128/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.235.1.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.236.0.0/17 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.236.128.0/17 [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O E2     10.237.0.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.238.44.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.238.44.128/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.239.44.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.0.0/12 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.0.0/14 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.1.104/29 [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O E2     10.240.15.0/25 
+           [110/1] via 172.25.10.64, 11:40:09, GigabitEthernet0/1/9
+O E2     10.240.17.0/24 
+           [110/1] via 172.25.10.64, 11:40:09, GigabitEthernet0/1/9
+O E2     10.240.20.0/24 [110/1] via 172.25.10.64, 1w2d, GigabitEthernet0/1/9
+O E2     10.240.21.0/24 [110/1] via 172.25.10.64, 1w2d, GigabitEthernet0/1/9
+O E2     10.240.26.0/24 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E1     10.240.28.0/22 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     10.240.44.0/23 [110/1] via 172.25.10.64, 2d14h, GigabitEthernet0/1/9
+O E2     10.240.51.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.52.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.53.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.54.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.55.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.56.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.64.0/19 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.84.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.88.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.92.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.116.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.117.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.152.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.153.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.154.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.160.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.162.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.166.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.167.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.168.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.173.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.176.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.181.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     10.240.192.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.204.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.240.240.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.21.0/24 [110/1] via 172.25.10.64, 1w2d, GigabitEthernet0/1/9
+O E2     10.241.22.0/24 [110/1] via 172.25.10.64, 1w2d, GigabitEthernet0/1/9
+O E2     10.241.23.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.24.0/24 
+           [110/1] via 172.25.10.64, 11:40:09, GigabitEthernet0/1/9
+O E2     10.241.26.0/24 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     10.241.44.0/23 [110/1] via 172.25.10.64, 2d14h, GigabitEthernet0/1/9
+O E2     10.241.51.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.52.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.53.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.54.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.55.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.56.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.64.0/19 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.84.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.120.0/24 [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O E2     10.241.136.16/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.136.32/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.136.48/28 
+           [110/1] via 172.25.10.64, 2d14h, GigabitEthernet0/1/9
+O E2     10.241.136.64/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.136.96/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.136.112/28 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.136.144/28 
+           [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O E2     10.241.136.160/28 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.136.208/28 
+           [110/1] via 172.25.10.64, 4w4d, GigabitEthernet0/1/9
+O E2     10.241.136.224/28 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.136.240/28 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.137.0/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.137.16/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.137.32/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.138.0/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.138.16/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.138.32/28 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O        10.241.138.48/28 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O E2     10.241.138.64/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.138.80/28 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     10.241.138.240/28 
+           [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     10.241.139.16/28 
+           [110/1] via 172.25.10.64, 11:40:09, GigabitEthernet0/1/9
+O E2     10.241.154.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.160.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.167.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.168.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.170.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.173.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.241.180.0/28 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     10.241.180.160/28 
+           [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     10.241.181.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     10.241.240.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.14.0/24 
+           [110/1] via 172.25.10.64, 11:40:09, GigabitEthernet0/1/9
+O E2     10.242.21.0/24 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.242.26.0/24 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     10.242.44.0/23 [110/1] via 172.25.10.64, 2d14h, GigabitEthernet0/1/9
+O E2     10.242.51.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.52.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.53.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.54.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.55.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.56.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.64.0/19 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.66.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.84.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.88.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.92.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.116.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.120.0/23 [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O E2     10.242.132.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.145.0/24 [110/1] via 172.25.10.64, 4w4d, GigabitEthernet0/1/9
+O E2     10.242.146.0/23 [110/1] via 172.25.10.64, 4w4d, GigabitEthernet0/1/9
+O E2     10.242.150.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.154.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.160.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.161.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.162.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.170.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.173.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.177.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.180.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.181.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     10.242.240.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.242.244.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.243.44.0/24 [110/1] via 172.25.10.64, 2d14h, GigabitEthernet0/1/9
+O E2     10.243.52.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.53.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.64.0/19 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.99.0/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.120.0/23 [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O E2     10.243.142.0/24 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     10.243.145.0/24 [110/1] via 172.25.10.64, 4w4d, GigabitEthernet0/1/9
+O E2     10.243.146.0/24 [110/1] via 172.25.10.64, 4w4d, GigabitEthernet0/1/9
+O E2     10.243.147.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.149.0/24 [110/1] via 172.25.10.64, 4w4d, GigabitEthernet0/1/9
+O E2     10.243.150.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.154.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.159.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.160.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.165.0/27 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.165.32/27 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.165.64/27 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.165.128/26 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.167.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.168.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.173.0/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.173.128/25 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.243.208.0/24 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.243.240.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.244.0.0/14 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.244.16.0/23 [110/1] via 172.25.10.64, 1w0d, GigabitEthernet0/1/9
+O E2     10.244.18.0/23 [110/1] via 172.25.10.64, 1w0d, GigabitEthernet0/1/9
+O E2     10.244.24.0/24 [110/1] via 172.25.10.64, 1w0d, GigabitEthernet0/1/9
+O E2     10.244.25.0/24 [110/1] via 172.25.10.64, 1w0d, GigabitEthernet0/1/9
+O E2     10.244.26.0/23 [110/1] via 172.25.10.64, 1w0d, GigabitEthernet0/1/9
+O E2     10.244.28.0/24 [110/1] via 172.25.10.64, 1w0d, GigabitEthernet0/1/9
+O E2     10.244.66.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.244.196.0/23 [110/1] via 172.25.10.64, 6w0d, GigabitEthernet0/1/9
+O E2     10.244.198.0/23 [110/1] via 172.25.10.64, 6w0d, GigabitEthernet0/1/9
+O E2     10.244.200.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.244.202.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.244.208.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.244.210.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.244.216.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.244.218.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.244.220.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.244.222.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.244.232.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.244.234.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.244.236.0/24 [110/1] via 172.25.10.64, 3d16h, GigabitEthernet0/1/9
+O E2     10.244.237.0/24 [110/1] via 172.25.10.64, 3d16h, GigabitEthernet0/1/9
+O E2     10.244.238.0/24 [110/1] via 172.25.10.64, 3d16h, GigabitEthernet0/1/9
+O E2     10.244.239.0/24 [110/1] via 172.25.10.64, 3d16h, GigabitEthernet0/1/9
+O E2     10.244.240.0/24 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     10.244.242.0/23 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     10.245.107.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.245.108.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.246.24.0/24 [110/1] via 172.25.10.64, 1w0d, GigabitEthernet0/1/9
+O E2     10.246.192.0/24 [110/1] via 172.25.10.64, 6w0d, GigabitEthernet0/1/9
+O E2     10.246.200.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.246.208.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.246.216.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.246.220.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.246.232.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.247.0.0/18 [110/1] via 172.25.10.64, 5d00h, GigabitEthernet0/1/9
+O E2     10.247.128.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.247.132.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.247.136.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.247.144.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.247.152.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.247.156.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.247.157.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.247.160.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.247.164.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.247.168.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.247.176.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.247.184.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.247.188.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.247.190.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.248.0.0/14 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.248.12.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.248.15.0/24 [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     10.248.20.0/22 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     10.248.24.0/23 [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     10.248.32.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.248.36.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.248.63.0/24 [110/1] via 172.25.10.64, 3w4d, GigabitEthernet0/1/9
+O E2     10.248.66.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.248.72.0/22 [110/1] via 172.25.10.64, 1w2d, GigabitEthernet0/1/9
+O E2     10.248.76.0/22 [110/1] via 172.25.10.64, 1w2d, GigabitEthernet0/1/9
+O E2     10.248.82.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.248.96.0/24 [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     10.248.97.0/24 [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     10.248.100.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.248.101.0/24 [110/1] via 172.25.10.64, 3d20h, GigabitEthernet0/1/9
+O E2     10.248.212.0/24 [110/1] via 172.25.10.64, 4w0d, GigabitEthernet0/1/9
+O E2     10.248.213.0/24 [110/1] via 172.25.10.64, 3d01h, GigabitEthernet0/1/9
+O E2     10.248.215.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.248.218.0/23 [110/1] via 172.25.10.64, 1d19h, GigabitEthernet0/1/9
+O E2     10.248.222.0/23 [110/1] via 172.25.10.64, 1d01h, GigabitEthernet0/1/9
+O E2     10.248.224.0/23 [110/1] via 172.25.10.64, 1d01h, GigabitEthernet0/1/9
+O E2     10.248.226.128/25 
+           [110/1] via 172.25.10.64, 1d01h, GigabitEthernet0/1/9
+O E2     10.248.227.0/24 [110/1] via 172.25.10.64, 1d01h, GigabitEthernet0/1/9
+O E2     10.248.230.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.248.231.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.248.232.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.248.234.0/24 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.248.235.0/24 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.249.16.0/21 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     10.249.220.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.249.221.0/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.250.24.0/23 [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     10.250.32.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.250.40.0/23 [110/1] via 172.25.10.64, 2d12h, GigabitEthernet0/1/9
+O E2     10.250.64.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.250.72.0/22 [110/1] via 172.25.10.64, 1w2d, GigabitEthernet0/1/9
+O E2     10.250.80.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.250.100.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.250.212.0/24 [110/1] via 172.25.10.64, 4w0d, GigabitEthernet0/1/9
+O E2     10.250.216.0/24 [110/1] via 172.25.10.64, 1d19h, GigabitEthernet0/1/9
+O E2     10.250.222.0/23 [110/1] via 172.25.10.64, 1d01h, GigabitEthernet0/1/9
+O E2     10.250.230.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.250.234.0/24 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.251.0.0/18 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     10.251.0.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.4.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.8.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.16.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.24.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.28.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.29.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.31.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.32.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.36.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.40.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.48.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.56.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.60.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.128.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.132.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.136.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.144.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.152.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.156.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.157.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.160.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.164.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.168.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.176.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.184.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.188.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.251.190.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.252.0.0/14 [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+S        10.252.0.0/16 is directly connected, Null0
+O        10.252.0.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.1.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.2.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.3.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.4.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.5.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.6.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.7.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.8.0/23 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.10.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.11.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.12.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.13.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.14.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.15.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.16.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.17.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.18.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.19.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.20.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.21.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.22.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.23.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.24.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.25.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.26.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.27.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.28.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.29.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.30.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.31.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.32.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.33.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.34.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.35.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.36.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.37.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.38.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.39.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.40.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.41.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.43.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.44.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.45.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.46.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.47.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.48.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.49.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.51.0/27 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.64.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+S        10.252.64.128/32 [1/0] via 172.25.10.73
+S        10.252.64.129/32 [1/0] via 172.25.10.73
+S        10.252.64.137/32 [1/0] via 172.25.10.73
+S        10.252.64.138/32 [1/0] via 172.25.10.73
+S        10.252.64.188/32 [1/0] via 172.25.10.73
+O        10.252.65.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+S        10.252.65.52/32 [1/0] via 172.25.10.73
+S        10.252.65.53/32 [1/0] via 172.25.10.73
+S        10.252.65.66/32 [1/0] via 172.25.10.73
+S        10.252.65.67/32 [1/0] via 172.25.10.73
+O        10.252.66.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.67.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.68.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.69.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.70.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.71.0/24 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O        10.252.72.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        10.252.73.0/24 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O        10.252.74.0/24 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O        10.252.75.0/24 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O        10.252.76.0/24 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O        10.252.77.0/24 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O        10.252.78.0/24 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.252.100.0/23 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.252.102.0/24 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.252.103.0/24 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     10.252.104.0/21 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O        10.252.113.0/24 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O        10.252.114.0/24 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O        10.252.115.0/24 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O        10.252.117.0/24 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O        10.252.118.0/24 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O        10.252.119.32/28 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O        10.252.119.48/28 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     10.252.128.0/17 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.252.136.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.252.138.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.252.140.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.252.143.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.252.177.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.252.180.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.253.0.0/16 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.253.0.0/21 [110/1] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O E2     10.253.8.0/21 [110/1] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O E2     10.253.113.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.253.118.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.253.119.32/28 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.253.119.48/28 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     10.253.128.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.253.136.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.253.144.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.253.184.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.253.216.0/21 
+           [110/1] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O E2     10.253.224.0/21 
+           [110/1] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O E2     10.253.232.0/21 
+           [110/1] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O E2     10.253.240.0/21 
+           [110/1] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O E2     10.253.248.0/21 
+           [110/1] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O E2     10.254.0.0/15 [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E1     10.254.0.0/18 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     10.254.0.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.4.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.8.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.16.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.17.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.24.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.28.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.29.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.31.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.32.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.36.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.40.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.48.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.56.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.61.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.254.128.0/18 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.254.192.0/21 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.254.200.0/21 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.254.208.0/21 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.254.224.0/21 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.254.232.0/21 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.254.240.0/21 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.254.248.0/21 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E1     10.255.0.0/19 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     10.255.0.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.2.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.4.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.8.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.12.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.14.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.15.0/26 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.15.64/27 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.15.128/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.16.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.18.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.20.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.24.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.28.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.31.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.64.0/19 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     10.255.64.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.66.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.68.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.72.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.76.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.78.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.79.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.79.128/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.80.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.82.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.84.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.88.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     10.255.92.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E1     10.255.128.0/19 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     10.255.192.0/19 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+      12.0.0.0/32 is subnetted, 1 subnets
+O E2     12.189.231.42 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      21.0.0.0/29 is subnetted, 1 subnets
+O E2     21.21.21.0 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+      64.0.0.0/8 is variably subnetted, 16 subnets, 5 masks
+O E2     64.26.199.240/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E1     64.26.202.197/32 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     64.26.203.109/32 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     64.76.45.192/26 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     64.76.82.96/28 [110/1] via 172.25.10.64, 2w1d, GigabitEthernet0/1/9
+O E2     64.76.82.176/28 [110/1] via 172.25.10.64, 2w1d, GigabitEthernet0/1/9
+O E2     64.76.245.40/30 [110/1] via 172.25.10.64, 5w3d, GigabitEthernet0/1/9
+O E2     64.76.245.44/30 [110/1] via 172.25.10.64, 2w1d, GigabitEthernet0/1/9
+O E1     64.209.231.96/27 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     64.212.84.172/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     64.215.13.64/32 [110/1] via 172.25.10.64, 4w3d, GigabitEthernet0/1/9
+O E2     64.215.49.91/32 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     64.215.55.212/30 [110/1] via 172.25.10.64, 4w3d, GigabitEthernet0/1/9
+O E2     64.215.55.220/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     64.215.147.176/30 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     64.215.147.180/30 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      65.0.0.0/30 is subnetted, 1 subnets
+O E2     65.152.239.76 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      66.0.0.0/26 is subnetted, 1 subnets
+O E1     66.119.39.128 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+      67.0.0.0/8 is variably subnetted, 8 subnets, 2 masks
+O E2     67.14.37.16/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     67.14.43.192/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     67.14.54.208/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     67.14.56.224/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     67.14.96.208/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     67.14.125.48/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     67.74.9.225/32 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     67.74.124.85/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      68.0.0.0/28 is subnetted, 2 subnets
+O E1     68.177.240.0 [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     68.177.241.0 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+      74.0.0.0/32 is subnetted, 1 subnets
+O E1     74.118.74.195 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+      100.0.0.0/8 is variably subnetted, 48 subnets, 5 masks
+O E1     100.64.245.32/27 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     100.65.0.0/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.65.0.8/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.65.0.12/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.65.0.16/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.65.0.52/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.65.0.56/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.65.0.60/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.65.0.64/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.65.0.72/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.65.0.76/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E1     100.65.23.97/32 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     100.65.23.101/32 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     100.65.23.105/32 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     100.65.23.109/32 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     100.70.224.96/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.70.224.112/28 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.70.233.96/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.70.233.160/28 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.70.254.16/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.70.254.64/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.70.255.16/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.70.255.29/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.70.255.30/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.70.255.80/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.70.255.144/28 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.70.255.208/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.70.255.224/28 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.70.255.240/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.72.245.32/27 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     100.88.8.216/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.88.13.8/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.88.13.16/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.88.44.168/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.88.44.224/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.88.45.0/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.88.45.8/29 [110/1] via 172.25.10.64, 1w1d, GigabitEthernet0/1/9
+O E2     100.88.64.72/29 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     100.88.65.96/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.88.65.112/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.88.71.248/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+B        100.88.111.112/29 [200/0] via 172.25.10.3, 7w0d
+O E2     100.88.112.192/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.88.159.144/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.88.185.72/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.88.201.40/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.90.127.176/28 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     100.90.127.192/28 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      103.0.0.0/32 is subnetted, 3 subnets
+O E2     103.76.206.102 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     103.209.110.102 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     103.209.111.102 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+      107.0.0.0/32 is subnetted, 1 subnets
+O E1     107.162.145.101 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+      126.0.0.0/16 is subnetted, 1 subnets
+O E2     126.14.0.0 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      140.87.0.0/32 is subnetted, 10 subnets
+O E2     140.87.154.5 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     140.87.154.20 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     140.87.154.23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     140.87.154.36 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     140.87.154.74 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     140.87.154.75 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     140.87.154.82 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     140.87.154.83 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     140.87.154.90 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     140.87.154.102 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  140.176.0.0/16 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+      144.23.0.0/32 is subnetted, 7 subnets
+O E2     144.23.179.35 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     144.23.179.36 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     144.23.191.188 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     144.23.191.191 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     144.23.191.192 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     144.23.195.131 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     144.23.195.132 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+      146.82.0.0/32 is subnetted, 1 subnets
+O E2     146.82.27.158 [110/1] via 172.25.10.64, 4w4d, GigabitEthernet0/1/9
+      157.206.0.0/16 is variably subnetted, 18 subnets, 3 masks
+O E2     157.206.48.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     157.206.127.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     157.206.148.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     157.206.152.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     157.206.155.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     157.206.160.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     157.206.164.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     157.206.165.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     157.206.166.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     157.206.167.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     157.206.169.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     157.206.174.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     157.206.175.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     157.206.200.0/24 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     157.206.201.0/24 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     157.206.202.0/23 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     157.206.206.0/23 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     157.206.208.0/24 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+      157.238.0.0/32 is subnetted, 1 subnets
+O E2     157.238.136.186 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2  158.117.0.0/16 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+      159.63.0.0/16 is variably subnetted, 6 subnets, 2 masks
+O E2     159.63.18.104/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     159.63.28.138/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     159.63.28.144/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     159.63.96.136/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     159.63.127.70/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     159.63.225.45/32 [110/1] via 172.25.10.64, 4w6d, GigabitEthernet0/1/9
+      161.242.0.0/16 is variably subnetted, 232 subnets, 13 masks
+O E2     161.242.0.0/16 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.0.0/17 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.3.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.32/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.33/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.34/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.38/32 
+           [110/1] via 172.25.10.64, 11:40:10, GigabitEthernet0/1/9
+O E2     161.242.13.71/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.101/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.102/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.103/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.104/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.105/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.108/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.112/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.114/32 
+           [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O E2     161.242.13.116/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.118/32 
+           [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O E2     161.242.13.141/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.177/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.201/32 
+           [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     161.242.13.209/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.210/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.212/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.13.213/32 
+           [110/1] via 172.25.10.64, 4w4d, GigabitEthernet0/1/9
+O E2     161.242.13.233/32 
+           [110/1] via 172.25.10.64, 4w4d, GigabitEthernet0/1/9
+O E2     161.242.13.241/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.16.0/20 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.32.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.34.48/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.42.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.44.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.48.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.52.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.53.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.54.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O        161.242.55.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        161.242.56.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+S        161.242.56.202/32 [1/0] via 172.25.10.73
+S        161.242.56.204/32 [1/0] via 172.25.10.73
+S        161.242.56.205/32 [1/0] via 172.25.10.73
+O        161.242.57.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+S        161.242.57.20/32 [1/0] via 172.25.10.73
+S        161.242.57.21/32 [1/0] via 172.25.10.73
+S        161.242.57.66/32 [1/0] via 172.25.10.73
+O E1     161.242.59.0/24 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     161.242.60.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.61.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.62.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.63.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.64.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.65.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.66.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.66.128/25 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O        161.242.67.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        161.242.68.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+S        161.242.68.13/32 [1/0] via 172.25.10.73
+S        161.242.68.69/32 [1/0] via 172.25.10.73
+S        161.242.68.81/32 [1/0] via 172.25.10.73
+S        161.242.68.82/32 [1/0] via 172.25.10.73
+S        161.242.68.96/32 [1/0] via 172.25.10.73
+S        161.242.68.148/32 [1/0] via 172.25.10.73
+S        161.242.68.149/32 [1/0] via 172.25.10.73
+O        161.242.69.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+S        161.242.69.30/32 [1/0] via 172.25.10.73
+O        161.242.70.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        161.242.71.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+S        161.242.71.54/32 [1/0] via 172.25.10.73
+S        161.242.71.55/32 [1/0] via 172.25.10.73
+S        161.242.71.56/32 [1/0] via 172.25.10.73
+S        161.242.71.57/32 [1/0] via 172.25.10.73
+S        161.242.71.58/32 [1/0] via 172.25.10.73
+S        161.242.71.74/32 [1/0] via 172.25.10.73
+O E2     161.242.72.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.76.0/24 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     161.242.77.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.80.0/23 [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O E2     161.242.82.0/25 [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O E2     161.242.82.128/25 
+           [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O E2     161.242.83.0/24 [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O        161.242.84.0/24 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O E2     161.242.85.0/24 [110/1] via 172.25.10.64, 4w4d, GigabitEthernet0/1/9
+O E2     161.242.87.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     161.242.87.128/25 
+           [110/1] via 172.25.10.64, 4w4d, GigabitEthernet0/1/9
+O E2     161.242.88.0/22 [110/1] via 172.25.10.64, 4w4d, GigabitEthernet0/1/9
+O E2     161.242.92.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     161.242.93.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.94.0/23 [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O E2     161.242.96.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     161.242.98.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.100.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.106.0/24 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     161.242.107.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.108.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.111.128/26 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.112.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.116.0/22 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     161.242.120.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.128.0/19 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.130.0/24 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     161.242.131.0/24 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     161.242.133.0/24 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     161.242.134.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.135.0/24 
+           [110/1] via 172.25.10.64, 11:40:10, GigabitEthernet0/1/9
+O E2     161.242.137.0/24 
+           [110/1] via 172.25.10.64, 11:40:10, GigabitEthernet0/1/9
+O E2     161.242.138.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.141.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.144.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.144.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.146.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.152.0/21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.152.0/22 [110/1] via 172.25.10.64, 5w0d, GigabitEthernet0/1/9
+O E2     161.242.156.0/23 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     161.242.158.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.158.0/24 
+           [110/1] via 172.25.10.64, 2d12h, GigabitEthernet0/1/9
+O E2     161.242.160.0/19 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.160.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.161.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.162.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.169.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.173.0/24 [110/1] via 172.25.10.64, 6w0d, GigabitEthernet0/1/9
+O E2     161.242.174.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.175.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.176.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.178.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E1     161.242.178.64/26 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     161.242.180.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.181.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.183.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.184.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.188.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.192.0/20 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.192.32/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.192.192/26 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.128/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.129/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.132/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.133/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.135/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.139/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.140/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.142/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.147/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.148/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.149/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.167/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.171/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.172/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.179/32 
+           [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     161.242.193.180/32 
+           [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     161.242.193.181/32 
+           [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     161.242.193.182/32 
+           [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     161.242.193.183/32 
+           [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     161.242.193.199/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.207/32 
+           [110/1] via 172.25.10.64, 6w0d, GigabitEthernet0/1/9
+O E2     161.242.193.210/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.193.212/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.194.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.196.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.200.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.201.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.202.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.204.0/25 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     161.242.205.0/24 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     161.242.208.0/20 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.210.0/23 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     161.242.214.0/23 [110/1] via 172.25.10.64, 3w4d, GigabitEthernet0/1/9
+O E2     161.242.216.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.217.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.218.0/23 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E1     161.242.221.0/24 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     161.242.222.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.224.0/19 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E1     161.242.224.0/24 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     161.242.225.0/24 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E1     161.242.225.133/32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     161.242.228.0/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.228.24/29 
+           [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     161.242.228.32/29 
+           [110/1] via 172.25.10.64, 5w0d, GigabitEthernet0/1/9
+O E2     161.242.228.40/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.228.48/29 
+           [110/1] via 172.25.10.64, 3w4d, GigabitEthernet0/1/9
+O E2     161.242.229.192/26 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.230.0/24 [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     161.242.231.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.232.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.233.0/24 [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     161.242.234.0/23 [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     161.242.236.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.237.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.239.64/27 
+           [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     161.242.239.128/27 
+           [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     161.242.240.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.242.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.243.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.244.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.245.0/26 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.247.0/24 
+           [110/1] via 172.25.10.64, 1d19h, GigabitEthernet0/1/9
+O E2     161.242.248.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.9/32 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     161.242.254.10/32 
+           [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     161.242.254.22/32 
+           [110/1] via 172.25.10.64, 1w2d, GigabitEthernet0/1/9
+O E2     161.242.254.23/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.26/32 
+           [110/1] via 172.25.10.64, 2d12h, GigabitEthernet0/1/9
+O E2     161.242.254.57/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.65/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.66/32 
+           [110/1] via 172.25.10.64, 1d19h, GigabitEthernet0/1/9
+O E2     161.242.254.80/32 
+           [110/1] via 172.25.10.64, 5w0d, GigabitEthernet0/1/9
+O E2     161.242.254.92/32 
+           [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     161.242.254.101/32 
+           [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     161.242.254.103/32 
+           [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     161.242.254.105/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.132/32 
+           [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     161.242.254.133/32 
+           [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     161.242.254.134/32 
+           [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     161.242.254.135/32 
+           [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     161.242.254.152/29 
+           [110/1] via 172.25.10.64, 2d12h, GigabitEthernet0/1/9
+O E2     161.242.254.179/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.180/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.181/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.192/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.193/32 
+           [110/1] via 172.25.10.64, 3w4d, GigabitEthernet0/1/9
+O E2     161.242.254.194/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.195/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.196/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.197/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.199/32 
+           [110/1] via 172.25.10.64, 5w0d, GigabitEthernet0/1/9
+O E2     161.242.254.208/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.212/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.221/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.222/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     161.242.254.227/32 
+           [110/1] via 172.25.10.64, 15:43:23, GigabitEthernet0/1/9
+O E2     161.242.255.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      162.13.0.0/32 is subnetted, 1 subnets
+O E1     162.13.212.65 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+      162.97.0.0/32 is subnetted, 1 subnets
+O E2     162.97.113.30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  165.89.0.0/16 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2  172.16.0.0/12 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  172.16.0.0/14 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      172.16.0.0/16 is variably subnetted, 30 subnets, 6 masks
+O E2     172.16.0.0/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.0.32/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.0.48/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.1.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     172.16.1.0/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.1.4/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.1.8/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.1.12/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.2.0/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.2.4/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.2.8/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.2.64/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.4.1/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.5.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.6.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.7.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E1     172.16.7.248/32 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+O E2     172.16.8.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.9.0/24 [110/1] via 172.25.10.64, 2w1d, GigabitEthernet0/1/9
+O E2     172.16.10.0/24 [110/1] via 172.25.10.64, 2w1d, GigabitEthernet0/1/9
+O E2     172.16.14.0/24 [110/1] via 172.25.10.64, 2w2d, GigabitEthernet0/1/9
+O E2     172.16.15.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.60.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.75.0/25 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.16.75.128/25 [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O E2     172.16.76.0/25 [110/1] via 172.25.10.64, 2w2d, GigabitEthernet0/1/9
+O E2     172.16.76.128/25 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.16.200.0/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.255.4/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.16.255.5/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      172.17.0.0/16 is variably subnetted, 2 subnets, 2 masks
+O E2     172.17.0.0/16 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.17.254.0/24 [110/1] via 172.25.10.64, 1w2d, GigabitEthernet0/1/9
+      172.18.0.0/16 is variably subnetted, 15 subnets, 6 masks
+O E2     172.18.0.0/16 [110/1] via 172.25.10.64, 2d12h, GigabitEthernet0/1/9
+O E2     172.18.18.16/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.18.18.56/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.18.18.80/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.18.18.96/29 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     172.18.18.112/28 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.18.19.0/27 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     172.18.19.160/27 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     172.18.19.192/27 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     172.18.20.0/26 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.18.20.88/29 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     172.18.20.96/27 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.18.20.160/28 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     172.18.121.128/25 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.18.124.0/25 [110/1] via 172.25.10.64, 4w0d, GigabitEthernet0/1/9
+      172.19.0.0/24 is subnetted, 3 subnets
+O E2     172.19.1.0 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.19.9.0 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.19.39.0 [110/1] via 172.25.10.64, 6d23h, GigabitEthernet0/1/9
+      172.20.0.0/16 is variably subnetted, 54 subnets, 2 masks
+O E2     172.20.20.8/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.128.68/30 [110/1] via 172.25.10.64, 4w3d, GigabitEthernet0/1/9
+O E2     172.20.128.180/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.20.128.188/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.20.129.0/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.129.136/30 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.129.180/30 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.131.64/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.131.80/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.144.52/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.144.60/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.146.32/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+B        172.20.180.0/29 [200/0] via 172.25.10.3, 7w0d
+O E2     172.20.180.16/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.180.24/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.180.40/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.180.48/29 [110/1] via 172.25.10.64, 4w0d, GigabitEthernet0/1/9
+O E2     172.20.180.56/29 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     172.20.180.64/29 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     172.20.180.72/29 
+           [110/1] via 172.25.10.64, 1d11h, GigabitEthernet0/1/9
+O E2     172.20.180.88/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.180.96/29 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     172.20.180.104/29 
+           [110/1] via 172.25.10.64, 3w3d, GigabitEthernet0/1/9
+O E2     172.20.180.120/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.180.128/29 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     172.20.180.136/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.180.144/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.180.160/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.180.168/29 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     172.20.180.192/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.180.208/29 
+           [110/1] via 172.25.10.64, 21:53:54, GigabitEthernet0/1/9
+O E2     172.20.180.240/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.180.248/29 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     172.20.181.0/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.181.16/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.181.24/29 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     172.20.181.32/29 [110/1] via 172.25.10.64, 3w4d, GigabitEthernet0/1/9
+O E2     172.20.181.48/29 
+           [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     172.20.181.64/29 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.181.72/29 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     172.20.181.104/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.181.112/29 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     172.20.181.120/29 
+           [110/1] via 172.25.10.64, 2w3d, GigabitEthernet0/1/9
+O E2     172.20.181.136/29 
+           [110/1] via 172.25.10.64, 2w4d, GigabitEthernet0/1/9
+O E2     172.20.181.152/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.181.160/29 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     172.20.181.168/29 
+           [110/1] via 172.25.10.64, 3w1d, GigabitEthernet0/1/9
+O E2     172.20.181.184/29 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.20.181.192/29 
+           [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     172.20.181.200/29 
+           [110/1] via 172.25.10.64, 2w1d, GigabitEthernet0/1/9
+O E2     172.20.181.216/29 
+           [110/1] via 172.25.10.64, 3d10h, GigabitEthernet0/1/9
+O E2     172.20.181.232/29 
+           [110/1] via 172.25.10.64, 2w4d, GigabitEthernet0/1/9
+O E2     172.20.181.248/29 
+           [110/1] via 172.25.10.64, 6w2d, GigabitEthernet0/1/9
+O E2     172.20.182.8/29 [110/1] via 172.25.10.64, 6w3d, GigabitEthernet0/1/9
+      172.21.0.0/24 is subnetted, 1 subnets
+O E2     172.21.18.0 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+      172.22.0.0/16 is variably subnetted, 6 subnets, 4 masks
+O E2     172.22.16.11/32 [110/1] via 172.25.10.64, 2w3d, GigabitEthernet0/1/9
+O E2     172.22.65.11/32 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E2     172.22.121.0/25 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.22.121.128/25 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.22.124.0/25 [110/1] via 172.25.10.64, 2w2d, GigabitEthernet0/1/9
+O E2     172.22.124.128/25 
+           [110/1] via 172.25.10.64, 2w2d, GigabitEthernet0/1/9
+      172.23.0.0/16 is variably subnetted, 5 subnets, 2 masks
+O E2     172.23.0.0/16 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.23.208.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.23.209.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.23.210.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.23.211.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      172.24.0.0/16 is variably subnetted, 25 subnets, 3 masks
+O E2     172.24.0.31/32 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.24.0.33/32 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.24.5.63/32 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.24.126.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.24.126.2/32 [110/1] via 172.25.10.64, 4w2d, GigabitEthernet0/1/9
+O E2     172.24.126.4/32 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     172.24.126.10/32 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.24.126.12/32 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.24.126.13/32 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     172.24.126.16/32 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     172.24.126.97/32 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.24.219.0/24 [110/1] via 172.25.10.64, 3w2d, GigabitEthernet0/1/9
+O E2     172.24.219.24/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.24.219.32/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.24.219.60/30 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     172.24.219.117/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.24.219.120/30 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.24.219.132/30 
+           [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     172.24.219.177/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.24.219.180/30 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.24.219.197/32 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.24.219.200/30 
+           [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.24.219.205/32 
+           [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     172.24.219.216/30 
+           [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     172.24.219.220/30 
+           [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+      172.25.0.0/16 is variably subnetted, 62 subnets, 9 masks
+O E2     172.25.0.0/16 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.0.0/24 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     172.25.1.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.2.0/24 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     172.25.8.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.8.16/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.8.17/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.8.18/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+S        172.25.10.0/24 is directly connected, Null0
+O        172.25.10.1/32 
+           [110/2] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        172.25.10.2/32 
+           [110/42] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        172.25.10.3/32 [110/2] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+C        172.25.10.4/32 is directly connected, Loopback0
+O        172.25.10.5/32 
+           [110/42] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+C        172.25.10.64/31 is directly connected, GigabitEthernet0/1/9
+L        172.25.10.65/32 is directly connected, GigabitEthernet0/1/9
+O        172.25.10.66/31 
+           [110/5] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+C        172.25.10.70/31 is directly connected, TenGigabitEthernet0/2/0
+L        172.25.10.70/32 is directly connected, TenGigabitEthernet0/2/0
+O        172.25.10.74/31 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        172.25.10.80/31 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        172.25.10.82/31 
+           [110/81] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        172.25.10.122/31 
+           [110/43] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        172.25.10.124/31 
+           [110/3] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        172.25.10.128/31 
+           [110/41] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O        172.25.10.240/29 
+           [110/51] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+S        172.25.11.0/24 is directly connected, Null0
+O        172.25.11.0/25 
+           [110/141] via 172.25.10.71, 7w0d, TenGigabitEthernet0/2/0
+O E2     172.25.12.0/25 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.12.128/26 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.12.248/30 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.12.249/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.44.0/24 [110/1] via 172.25.10.64, 2d14h, GigabitEthernet0/1/9
+O E2     172.25.45.0/26 [110/1] via 172.25.10.64, 2d14h, GigabitEthernet0/1/9
+O E2     172.25.45.64/26 [110/1] via 172.25.10.64, 2d14h, GigabitEthernet0/1/9
+O E2     172.25.45.128/26 
+           [110/1] via 172.25.10.64, 2d14h, GigabitEthernet0/1/9
+O E2     172.25.45.192/27 
+           [110/1] via 172.25.10.64, 2d14h, GigabitEthernet0/1/9
+O E2     172.25.45.253/32 
+           [110/1] via 172.25.10.64, 2d14h, GigabitEthernet0/1/9
+O E2     172.25.45.254/32 
+           [110/1] via 172.25.10.64, 2d14h, GigabitEthernet0/1/9
+O E2     172.25.45.255/32 
+           [110/1] via 172.25.10.64, 2d14h, GigabitEthernet0/1/9
+O E2     172.25.47.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.62.17/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.62.26/32 [110/1] via 172.25.10.64, 4w4d, GigabitEthernet0/1/9
+O E2     172.25.62.27/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.62.31/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.62.83/32 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.25.62.85/32 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.25.62.100/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.62.115/32 [110/1] via 172.25.10.64, 1w4d, GigabitEthernet0/1/9
+O E2     172.25.128.0/24 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     172.25.132.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.135.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.136.0/26 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+O E2     172.25.136.64/26 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.137.1/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.137.2/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.137.3/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.137.4/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.137.5/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.137.6/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.137.7/32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.25.195.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      172.26.0.0/16 is variably subnetted, 100 subnets, 6 masks
+O E2     172.26.26.0/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.8/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.12/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.20/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.24/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.28/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.36/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.44/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.48/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.52/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.64/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.72/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.76/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.84/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.88/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.96/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.100/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.104/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.108/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.116/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.120/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.128/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.132/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.136/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.148/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.152/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.156/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.168/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.180/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.184/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.188/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.192/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.220/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.228/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.26.252/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.27.36/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.27.40/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.28.176/32 [110/1] via 172.25.10.64, 1w1d, GigabitEthernet0/1/9
+O E2     172.26.37.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.112.248/29 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.0/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.12/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.16/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.20/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.24/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.28/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.32/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.40/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.44/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.48/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.52/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.56/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.60/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.68/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.72/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.80/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.84/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.88/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.92/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.96/30 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.100/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.104/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.108/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.112/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.128/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.136/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.140/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.144/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.148/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.152/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.160/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.164/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.168/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.172/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.180/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.192/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.196/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.200/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.204/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.208/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.212/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.224/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.236/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.240/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.248/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.123.252/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.159.0/25 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.182.0/25 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.232.0/25 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.232.128/25 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.233.0/25 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.233.128/25 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.235.0/28 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.235.16/28 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.238.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.248.0/25 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.248.128/25 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.251.0/25 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.251.128/25 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.26.253.128/25 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+      172.27.0.0/16 is variably subnetted, 34 subnets, 8 masks
+O E2     172.27.2.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.3.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.4.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.22.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.23.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.28.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     172.27.139.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.196.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.240.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.241.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.242.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.243.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.244.0/25 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.244.128/25 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.245.128/25 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.246.128/25 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.247.0/25 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.249.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.250.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.251.0/25 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.251.128/27 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.251.224/27 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.252.64/26 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.252.128/27 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.252.160/27 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.252.176/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.252.192/27 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.253.0/25 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.254.0/28 [110/1] via 172.25.10.64, 4w3d, GigabitEthernet0/1/9
+O E2     172.27.254.104/32 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.254.120/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.254.124/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.254.220/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.27.254.248/30 
+           [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+      172.28.0.0/16 is variably subnetted, 25 subnets, 3 masks
+O E2     172.28.23.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.28.26.0/24 [110/1] via 172.25.10.64, 3d22h, GigabitEthernet0/1/9
+O E2     172.28.29.0/24 [110/1] via 172.25.10.64, 1w0d, GigabitEthernet0/1/9
+O E2     172.28.31.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.28.94.0/24 [110/1] via 172.25.10.64, 2w0d, GigabitEthernet0/1/9
+O E2     172.28.118.0/27 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.28.118.32/27 [110/1] via 172.25.10.64, 1w0d, GigabitEthernet0/1/9
+O E2     172.28.118.64/27 [110/1] via 172.25.10.64, 5w2d, GigabitEthernet0/1/9
+O E2     172.28.121.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.28.124.0/24 [110/1] via 172.25.10.64, 1d20h, GigabitEthernet0/1/9
+O E2     172.28.126.0/27 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.28.126.32/27 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.28.126.64/26 [110/1] via 172.25.10.64, 5w2d, GigabitEthernet0/1/9
+O E2     172.28.171.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.28.199.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.28.222.0/24 [110/1] via 172.25.10.64, 5d08h, GigabitEthernet0/1/9
+O E2     172.28.233.0/26 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.28.235.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.28.237.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.28.238.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.28.239.0/24 [110/1] via 172.25.10.64, 2w4d, GigabitEthernet0/1/9
+O E2     172.28.244.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.28.246.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.28.252.0/24 [110/1] via 172.25.10.64, 1w3d, GigabitEthernet0/1/9
+O E2     172.28.255.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      172.29.0.0/16 is variably subnetted, 19 subnets, 3 masks
+O E2     172.29.1.0/24 [110/1] via 172.25.10.64, 6d20h, GigabitEthernet0/1/9
+O E2     172.29.2.0/23 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.29.2.0/24 [110/1] via 172.25.10.64, 1d02h, GigabitEthernet0/1/9
+O E2     172.29.4.0/23 [110/1] via 172.25.10.64, 2w4d, GigabitEthernet0/1/9
+O E2     172.29.6.0/23 [110/1] via 172.25.10.64, 5w2d, GigabitEthernet0/1/9
+O E2     172.29.8.0/23 [110/1] via 172.25.10.64, 5w2d, GigabitEthernet0/1/9
+O E2     172.29.9.0/24 [110/1] via 172.25.10.64, 1w1d, GigabitEthernet0/1/9
+O E2     172.29.10.0/23 [110/1] via 172.25.10.64, 5w2d, GigabitEthernet0/1/9
+O E2     172.29.12.0/23 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.29.14.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.29.76.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.29.77.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.29.78.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.29.79.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.29.80.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.29.81.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.29.82.0/24 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     172.29.107.0/24 [110/1] via 172.25.10.64, 3d05h, GigabitEthernet0/1/9
+O E2     172.29.182.0/27 [110/1] via 172.25.10.64, 2w0d, GigabitEthernet0/1/9
+      172.30.0.0/22 is subnetted, 1 subnets
+O E2     172.30.0.0 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      174.128.0.0/28 is subnetted, 1 subnets
+S        174.128.54.96 is directly connected, Null0
+      177.52.0.0/32 is subnetted, 1 subnets
+O E2     177.52.65.99 [110/1] via 172.25.10.64, 2w3d, GigabitEthernet0/1/9
+      178.248.0.0/32 is subnetted, 1 subnets
+O E2     178.248.247.103 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      185.66.0.0/24 is subnetted, 1 subnets
+O E2     185.66.154.0 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      185.146.0.0/29 is subnetted, 2 subnets
+O E2     185.146.180.32 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     185.146.180.152 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      187.9.0.0/32 is subnetted, 1 subnets
+O E2     187.9.214.86 [110/1] via 172.25.10.64, 2w3d, GigabitEthernet0/1/9
+      189.125.0.0/27 is subnetted, 1 subnets
+O E2     189.125.151.64 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+      190.217.0.0/28 is subnetted, 1 subnets
+O E2     190.217.66.208 [110/1] via 172.25.10.64, 2w1d, GigabitEthernet0/1/9
+O E2  192.168.0.0/16 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  192.168.2.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  192.168.3.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  192.168.11.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  192.168.12.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  192.168.13.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  192.168.20.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  192.168.30.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  192.168.40.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  192.168.41.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  192.168.50.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  192.168.110.0/24 [110/1] via 172.25.10.64, 2w3d, GigabitEthernet0/1/9
+O E2  192.168.120.0/24 [110/1] via 172.25.10.64, 2w3d, GigabitEthernet0/1/9
+O E2  192.168.121.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  192.168.122.0/24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      193.28.101.0/27 is subnetted, 1 subnets
+O E2     193.28.101.0 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      193.162.16.0/32 is subnetted, 1 subnets
+O E2     193.162.16.21 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      193.201.136.0/32 is subnetted, 1 subnets
+O E2     193.201.136.24 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      195.234.229.0/32 is subnetted, 1 subnets
+O E2     195.234.229.234 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      195.234.230.0/32 is subnetted, 1 subnets
+O E2     195.234.230.162 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  198.155.0.0/16 [110/1] via 172.25.10.64, 5w4d, GigabitEthernet0/1/9
+      200.41.66.0/27 is subnetted, 1 subnets
+O E2     200.41.66.64 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+      200.55.62.0/24 is variably subnetted, 3 subnets, 2 masks
+O E2     200.55.62.128/26 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     200.55.62.178/32 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+O E2     200.55.62.189/32 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+      200.186.59.0/27 is subnetted, 1 subnets
+O E2     200.186.59.64 [110/1] via 172.25.10.64, 6w1d, GigabitEthernet0/1/9
+      200.192.156.0/32 is subnetted, 1 subnets
+O E2     200.192.156.40 [110/1] via 172.25.10.64, 2w3d, GigabitEthernet0/1/9
+      200.248.93.0/32 is subnetted, 1 subnets
+O E2     200.248.93.130 [110/1] via 172.25.10.64, 2w3d, GigabitEthernet0/1/9
+      202.41.3.0/32 is subnetted, 1 subnets
+O E1     202.41.3.167 [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+      202.58.132.0/32 is subnetted, 1 subnets
+O E1     202.58.132.142 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+      204.79.199.0/32 is subnetted, 1 subnets
+O E2     204.79.199.2 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+      205.171.179.0/28 is subnetted, 1 subnets
+O E2     205.171.179.64 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      207.136.163.0/32 is subnetted, 1 subnets
+O E2     207.136.163.31 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  207.227.224.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2  207.227.240.0/22 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      208.168.140.0/28 is subnetted, 1 subnets
+O E2     208.168.140.16 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      208.168.141.0/28 is subnetted, 1 subnets
+O E2     208.168.141.112 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      208.168.143.0/28 is subnetted, 1 subnets
+O E2     208.168.143.208 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      208.168.147.0/28 is subnetted, 2 subnets
+O E2     208.168.147.176 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     208.168.147.224 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      208.168.152.0/28 is subnetted, 1 subnets
+O E2     208.168.152.208 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      208.168.156.0/28 is subnetted, 1 subnets
+O E2     208.168.156.64 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      208.168.157.0/28 is subnetted, 1 subnets
+O E2     208.168.157.16 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      208.168.158.0/28 is subnetted, 1 subnets
+O E2     208.168.158.16 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      208.168.162.0/28 is subnetted, 1 subnets
+O E2     208.168.162.160 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      208.168.163.0/28 is subnetted, 1 subnets
+O E2     208.168.163.80 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      208.168.164.0/28 is subnetted, 2 subnets
+O E2     208.168.164.64 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+O E2     208.168.164.144 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      208.168.165.0/28 is subnetted, 1 subnets
+O E2     208.168.165.16 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      208.168.166.0/28 is subnetted, 1 subnets
+O E2     208.168.166.64 [110/1] via 172.25.10.64, 7w0d, GigabitEthernet0/1/9
+      209.95.252.0/31 is subnetted, 1 subnets
+O E1     209.95.252.54 
+           [110/71] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+      209.130.252.0/32 is subnetted, 1 subnets
+O E2     209.130.252.250 [110/1] via 172.25.10.64, 1d04h, GigabitEthernet0/1/9
+O E1  209.191.134.0/24 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+      216.74.163.0/26 is subnetted, 1 subnets
+O E1     216.74.163.0 [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+      216.109.74.0/28 is subnetted, 1 subnets
+O E1     216.109.74.32 
+           [110/61] via 172.25.10.71, 2w1d, TenGigabitEthernet0/2/0
+sh vpc
+                    ^
+% Invalid input detected at '^' marker.
+
