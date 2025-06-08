@@ -1,0 +1,1667 @@
+sh run | i hostname
+hostname AM-BOT-A01-R01
+**                 Bothell WA - $(hostname)                     **
+sh run
+Building configuration...
+
+Current configuration : 27430 bytes
+!
+! Last configuration change at 06:30:49 PDT Sat Mar 22 2025 by david.digiacomo.t1
+! NVRAM config last updated at 06:32:59 PDT Sat Mar 22 2025 by david.digiacomo.t1
+!
+version 15.4
+service tcp-keepalives-in
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service unsupported-transceiver
+!
+hostname AM-BOT-A01-R01
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging buffered 512000
+no logging console
+enable secret 5 $1$59bR$CJqSPjLbh5nmcQKJkZIsD1
+enable password 7 15020A1F173D24362C
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ BHC-GRP
+ server name TACACS_am-njio-ise-psn1
+ server name TACACS_am-sctio-ise-psn2
+ ip tacacs source-interface Loopback0
+!
+aaa authentication fail-message ^CYOUR ATTEMPT TO ACCESS THIS SYSTEM WAS REJECTED AND HAS BEEN LOGGED ^C
+aaa authentication login BHC group BHC-GRP local-case
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec BHC group BHC-GRP local if-authenticated 
+aaa authorization commands 0 BHC group BHC-GRP local if-authenticated 
+aaa authorization commands 1 BHC group BHC-GRP local if-authenticated 
+aaa authorization commands 7 BHC group BHC-GRP local if-authenticated 
+aaa authorization commands 15 BHC group BHC-GRP local if-authenticated 
+aaa authorization network default local 
+aaa accounting exec default start-stop group BHC-GRP
+aaa accounting commands 0 default start-stop group BHC-GRP
+aaa accounting commands 1 default start-stop group BHC-GRP
+aaa accounting commands 7 default start-stop group BHC-GRP
+aaa accounting commands 15 default start-stop group BHC-GRP
+!
+!
+!
+!
+!
+aaa session-id common
+process cpu threshold type total rising 70 interval 60
+clock timezone PST -8 0
+clock summer-time PDT recurring
+!
+!
+crypto pki trustpoint TP-self-signed-1626516623
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1626516623
+ revocation-check none
+ rsakeypair TP-self-signed-1626516623
+!
+!
+crypto pki certificate chain TP-self-signed-1626516623
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 31363236 35313636 3233301E 170D3134 31323034 30343231 
+  31325A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 36323635 
+  31363632 3330819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281 
+  81009D36 3E36046E 08C4C272 0CA42FD6 2DFE1698 05E8ADBE 0BB3CED3 6AB90883 
+  1D83268E 6708E5B9 6AE8E8E5 67D437C4 2240D9AB 3DFE9484 29B89E80 B08896ED 
+  2EE8E937 A1D81CDA C62395BD C5F15A1B 25CA9C79 A35DA87E 3FCA2ECF 848BCC0D 
+  E9A17FA0 4D171E3D BC2158A6 47FE955D AFFD0E15 1FF46566 A9FAD6BC EBCDBA48 
+  130F0203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603 
+  551D2304 18301680 146DA84E A5982D3A 2B8217FF EFDF4081 E56E449E 4B301D06 
+  03551D0E 04160414 6DA84EA5 982D3A2B 8217FFEF DF4081E5 6E449E4B 300D0609 
+  2A864886 F70D0101 05050003 8181001F 46646A4B 50F71885 E48309C1 C74C9AEC 
+  6BB37181 C0896F50 3AC9E971 7E37C8B0 E7F32CB4 9CD30DD1 126BC362 9F4D3DB8 
+  9134A8C0 E9A3913A 7C004764 03426B06 33721C01 374A41BF B6F938A0 1E6C7198 
+  315672A9 628A9259 1896E932 2B072FF9 64D83593 FA32D49A F6971764 B145B6DC 
+  706E5421 E128B351 F7775A57 906E83
+  	quit
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip flow-cache timeout active 1
+ip domain name valeant.com
+ip name-server 10.240.183.66
+ip cef
+no ipv6 cef
+!
+!
+flow exporter Lumen-Netflow-Exporter
+ destination 68.177.240.7
+ source Loopback0
+ transport udp 2055
+ option interface-table
+ option vrf-table
+ option sampler-table
+ option application-table
+ option application-attributes
+!
+!
+flow record Lumen-Netflow-Record-In
+ match ipv4 tos
+ match ipv4 protocol
+ match ipv4 source address
+ match ipv4 destination address
+ match transport source-port
+ match transport destination-port
+ match interface input
+ match flow direction
+ collect routing next-hop address ipv4
+ collect ipv4 source prefix
+ collect ipv4 source mask
+ collect ipv4 destination mask
+ collect transport tcp flags
+ collect flow sampler
+ collect counter bytes long
+ collect counter packets long
+!
+!
+flow record Lumen-Netflow-Record-Out
+ match ipv4 tos
+ match ipv4 protocol
+ match ipv4 source address
+ match ipv4 destination address
+ match transport source-port
+ match transport destination-port
+ match interface output
+ match flow direction
+ collect routing next-hop address ipv4
+ collect ipv4 source prefix
+ collect ipv4 source mask
+ collect ipv4 destination mask
+ collect transport tcp flags
+ collect flow sampler
+ collect counter bytes long
+ collect counter packets long
+!
+!
+flow monitor Lumen-Netflow-Monitor-In
+ exporter Lumen-Netflow-Exporter
+ cache timeout inactive 10
+ cache timeout active 60
+ record Lumen-Netflow-Record-In
+!
+!
+flow monitor Lumen-Netflow-Monitor-Out
+ exporter Lumen-Netflow-Exporter
+ cache timeout inactive 10
+ cache timeout active 60
+ record Lumen-Netflow-Record-Out
+!
+!
+multilink bundle-name authenticated
+!
+!
+cts logging verbose
+license udi pid C3900-SPE150/K9 sn FOC18441U8J
+!
+!
+archive
+ path flash:
+ maximum 14
+ write-memory
+username admin privilege 15 secret 5 $1$B1KD$Z.gBZKqM9cUn/unroZQoV.
+username BHCAdmin privilege 15 secret 5 $1$NWeQ$1kfpXgSFKXaHOBZhT4H0z.
+username lumen privilege 15 secret 5 $1$C5uI$Jz11AKrYWq8gv0yNr26wR/
+!
+redundancy
+!
+!
+!
+crypto ikev2 keyring Flex_key
+ peer Spokes
+  address 0.0.0.0 0.0.0.0
+  pre-shared-key local HL\tjOvxi\|CtBQ+;Hk"
+  pre-shared-key remote HL\tjOvxi\|CtBQ+;Hk"
+ !
+!
+!
+crypto ikev2 profile Flex_IKEv2
+ match identity remote address 0.0.0.0 
+ authentication remote pre-share
+ authentication local pre-share
+ keyring local Flex_key
+ dpd 10 2 periodic
+ aaa authorization group psk list default default
+ virtual-template 1
+!
+!
+!
+ip tftp source-interface Loopback0
+ip ssh source-interface Loopback0
+ip ssh logging events
+ip ssh version 2
+!
+class-map match-all Enhanced+
+ match ip dscp af41 
+ match ip dscp af21 
+ match ip dscp af31 
+class-map match-all BHC-BASIC
+ match access-group name BHC-BASIC
+ match ip dscp cs1  af11  af12 
+class-map match-all BHC-PREMIUM
+ match access-group name BHC-PREMIUM
+ match ip dscp cs5  ef 
+class-map match-all BHC-ENHANCED
+ match access-group name BHC-ENHANCED
+ match ip dscp cs2  af21  cs3  af31  cs4  af41  cs6  cs7 
+class-map match-all Premium+
+ match ip dscp ef 
+!
+policy-map GBLX-QOS
+ class Premium+
+  priority percent 10
+  set ip dscp ef
+ class Enhanced+
+  bandwidth remaining percent 80 
+  set dscp af41
+ class class-default
+  bandwidth remaining percent 10 
+policy-map GBLX-QOS-SHAP
+ class class-default
+  shape average 10000000
+   service-policy GBLX-QOS
+policy-map EGRESS-QOS-POLICY
+ class BHC-PREMIUM
+  priority percent 20
+  set ip dscp ef
+ class BHC-ENHANCED
+  bandwidth remaining percent 60 
+  set ip dscp af41
+ class BHC-BASIC
+  bandwidth remaining percent 10 
+  set ip dscp af31
+ class class-default
+  bandwidth remaining percent 10 
+  set ip dscp af21
+!
+! 
+!
+!
+crypto ipsec transform-set IKEv2 esp-gcm 
+ mode transport
+!
+crypto ipsec profile FlexVPN_IPSec
+ set transform-set IKEv2 
+ set ikev2-profile Flex_IKEv2
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description -- MGNT --
+ ip address 172.25.12.249 255.255.255.255
+ ip nbar protocol-discovery
+!
+interface Tunnel1
+ description FlexVPN Tunnel to AM-SCT-D03-R01
+ ip address 172.29.1.14 255.255.255.0
+ ip mtu 1400
+ ip nbar protocol-discovery
+ ip nhrp network-id 2
+ ip nhrp shortcut virtual-template 1
+ ip nhrp redirect
+ ip tcp adjust-mss 1360
+ shutdown
+ tunnel source Port-channel12
+ tunnel destination 74.114.186.254
+ tunnel path-mtu-discovery
+ tunnel protection ipsec profile FlexVPN_IPSec
+!
+interface Tunnel2
+ description FlexVPN tunnel to AM-EDS-A08-R02
+ ip address 172.29.2.14 255.255.255.0
+ ip mtu 1400
+ ip nbar protocol-discovery
+ ip nhrp network-id 2
+ ip nhrp shortcut virtual-template 1
+ ip nhrp redirect
+ ip tcp adjust-mss 1360
+ shutdown
+ tunnel source Port-channel12
+ tunnel destination 74.114.184.254
+ tunnel path-mtu-discovery
+ tunnel protection ipsec profile FlexVPN_IPSec
+!
+interface Port-channel12
+ ip address 172.25.12.100 255.255.255.128
+ ip nbar protocol-discovery
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ description AM-BOT-W01-SW2-L3-Internet-Gi0/33
+ no ip address
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/0.989
+ encapsulation dot1Q 989
+ ip address 172.20.180.165 255.255.255.248
+ ip flow monitor Lumen-Netflow-Monitor-In input
+ ip flow monitor Lumen-Netflow-Monitor-Out output
+!
+interface GigabitEthernet0/0.990
+ encapsulation dot1Q 990
+ ip address 172.20.180.173 255.255.255.248
+ ip flow monitor Lumen-Netflow-Monitor-In input
+ ip flow monitor Lumen-Netflow-Monitor-Out output
+!
+interface GigabitEthernet0/1
+ description AM-BOT-A01-5K2-Eth 102/1/43
+ no ip address
+ duplex auto
+ speed auto
+ channel-group 12
+!
+interface GigabitEthernet0/2
+ description AM-BOT-A01-5K2-Eth 101/1/43
+ no ip address
+ duplex auto
+ speed auto
+ channel-group 12
+!
+interface Virtual-Template1 type tunnel
+ ip unnumbered Tunnel1
+ ip mtu 1400
+ ip nhrp network-id 2
+ ip nhrp shortcut virtual-template 1
+ ip nhrp redirect
+ ip tcp adjust-mss 1360
+ tunnel path-mtu-discovery
+ tunnel protection ipsec profile FlexVPN_IPSec
+!
+interface Virtual-Template2 type tunnel
+ ip unnumbered Tunnel1
+ ip mtu 1400
+ ip nhrp network-id 1
+ ip nhrp shortcut virtual-template 2
+ ip nhrp redirect
+ ip tcp adjust-mss 1360
+ shutdown
+ tunnel path-mtu-discovery
+ tunnel protection ipsec profile FlexVPN_IPSec
+!
+!
+router eigrp 251
+ network 172.25.12.0 0.0.0.127
+ network 172.25.12.100 0.0.0.0
+ network 172.25.12.249 0.0.0.0
+ redistribute bgp 65021 metric 50000 1 255 1 1500
+ passive-interface default
+ no passive-interface Port-channel12
+ eigrp router-id 172.25.12.249
+!
+router bgp 65021
+ template peer-policy FlexVPN-Policy
+  route-map FlexVPN-Prepend out
+  prefix-list Inbound in
+  prefix-list Outbound out
+  soft-reconfiguration inbound
+  maximum-prefix 3000 50 restart 30
+ exit-peer-policy
+ !
+ template peer-session FlexVPN-NJIO
+  update-source Tunnel2
+ exit-peer-session
+ !
+ template peer-session FlexVPN-SCTIO
+  update-source Tunnel1
+ exit-peer-session
+ !
+ bgp router-id 172.25.12.249
+ bgp log-neighbor-changes
+ neighbor 172.20.128.117 remote-as 3549
+ neighbor 172.20.128.117 description MPLS Level3-Peer
+ neighbor 172.20.128.117 shutdown
+ neighbor 172.20.129.102 remote-as 3549
+ neighbor 172.20.129.102 description Level3-BGP-Peer
+ neighbor 172.20.180.162 remote-as 64514
+ neighbor 172.20.180.162 description SD-WAN1 RT1 VNI0/3
+ neighbor 172.20.180.163 remote-as 64514
+ neighbor 172.20.180.163 description SD-WAN2 RT1 VNI0/3
+ neighbor 172.29.1.1 remote-as 65072
+ neighbor 172.29.1.1 inherit peer-session FlexVPN-SCTIO
+ neighbor 172.29.1.1 description SCTIO Hub AM-SCT-D03-R01
+ neighbor 172.29.2.1 remote-as 65001
+ neighbor 172.29.2.1 inherit peer-session FlexVPN-NJIO
+ neighbor 172.29.2.1 description NJIO Hub AM-EDS-A08-R02
+ !
+ address-family ipv4
+  network 0.0.0.0 backdoor
+  network 10.240.52.0 mask 255.255.252.0
+  network 10.240.56.0 mask 255.255.254.0
+  network 10.241.52.0 mask 255.255.252.0
+  network 10.241.56.0 mask 255.255.255.0
+  network 10.241.136.16 mask 255.255.255.240
+  network 10.242.52.0 mask 255.255.252.0
+  network 10.242.56.0 mask 255.255.255.0
+  network 10.243.52.0 mask 255.255.252.0
+  network 172.23.208.0 mask 255.255.255.0
+  network 172.23.209.0 mask 255.255.255.0
+  network 172.23.210.0 mask 255.255.255.0
+  network 172.23.211.0 mask 255.255.255.0
+  network 172.25.12.0 mask 255.255.255.0
+  network 172.25.12.0 mask 255.255.255.128
+  network 172.25.12.128 mask 255.255.255.192
+  network 172.25.12.249 mask 255.255.255.255
+  network 192.168.11.0
+  redistribute eigrp 251
+  neighbor 172.20.128.117 activate
+  neighbor 172.20.128.117 send-community
+  neighbor 172.20.128.117 soft-reconfiguration inbound
+  neighbor 172.20.128.117 prefix-list Inbound in
+  neighbor 172.20.128.117 prefix-list Outbound out
+  neighbor 172.20.129.102 activate
+  neighbor 172.20.129.102 soft-reconfiguration inbound
+  neighbor 172.20.129.102 prefix-list Inbound in
+  neighbor 172.20.129.102 prefix-list Outbound out
+  neighbor 172.20.180.162 activate
+  neighbor 172.20.180.162 send-community
+  neighbor 172.20.180.162 soft-reconfiguration inbound
+  neighbor 172.20.180.162 route-map SDWAN-RT1_in in
+  neighbor 172.20.180.162 route-map BOTHELL_SDWAN_out out
+  neighbor 172.20.180.163 activate
+  neighbor 172.20.180.163 send-community
+  neighbor 172.20.180.163 soft-reconfiguration inbound
+  neighbor 172.20.180.163 route-map SDWAN-RT1_in in
+  neighbor 172.20.180.163 route-map BOTHELL_SDWAN_out out
+  neighbor 172.29.1.1 activate
+  neighbor 172.29.1.1 inherit peer-policy FlexVPN-Policy
+  neighbor 172.29.1.1 soft-reconfiguration inbound
+  neighbor 172.29.1.1 route-map SCTIORouteFlexRM in
+  neighbor 172.29.2.1 activate
+  neighbor 172.29.2.1 inherit peer-policy FlexVPN-Policy
+  neighbor 172.29.2.1 soft-reconfiguration inbound
+  neighbor 172.29.2.1 route-map NJIORouteFlexRM in
+ exit-address-family
+!
+ip forward-protocol nd
+!
+ip bgp-community new-format
+ip community-list expanded SDWAN_filter deny _202:005
+ip community-list expanded SDWAN_filter permit _303:
+ip as-path access-list 10 permit _65072$
+no ip http server
+ip http access-class 23
+ip http authentication local
+ip http secure-server
+ip http timeout-policy idle 60 life 86400 requests 10000
+ip flow-export source Loopback0
+ip flow-export version 9
+ip flow-export destination 161.242.68.146 2005
+ip flow-export destination 161.242.218.59 2055
+ip flow-top-talkers
+ top 15
+ sort-by bytes
+!
+ip route 161.242.97.254 255.255.255.255 172.25.12.1 name AM-SCT-D03-R01-FlexVPN
+ip tacacs source-interface Loopback0
+!
+ip access-list standard LUMEN_10
+ permit 68.177.240.0 0.0.0.255 log
+ip access-list standard VTY_ACCESS
+ remark TO RESTRICT VTY ACCESS
+ permit 10.0.0.0 0.255.255.255 log
+ permit 161.242.0.0 0.0.255.255 log
+ permit 172.16.0.0 0.15.255.255 log
+ permit 68.177.240.0 0.0.0.15 log
+ permit 68.177.241.0 0.0.0.15 log
+!
+ip access-list extended BHC-BASIC
+ remark ***WARNING*** - CHANGES MUST BE IN SPREADHSEET
+ permit icmp any any precedence immediate
+ permit tcp any any eq 2065
+ permit tcp any any eq 2067
+ permit tcp any any eq 1433
+ permit tcp any eq 1433 any
+ permit tcp any any eq 1720
+ permit tcp any eq 1720 any
+ permit tcp any eq 19000 any
+ permit tcp any any eq 19000
+ permit tcp any eq 16260 any
+ permit tcp any any eq 16260
+ permit tcp any any eq 443
+ permit tcp any eq 443 any
+ permit tcp any any eq 9656
+ permit tcp any eq 9656 any
+ permit udp any eq snmp host 161.242.3.45
+ permit tcp any any range 9700 9999
+ permit tcp any range 9700 9999 any
+ permit tcp any any range 9000 9399
+ permit tcp any range 9000 9399 any
+ permit tcp any any eq 30110
+ permit tcp any eq 30110 any
+ permit tcp any host 161.242.30.193 eq www
+ permit tcp any any eq 20060
+ permit tcp any any eq 21160
+ permit tcp any any eq 21060
+ permit tcp any any eq 9705
+ permit tcp any any eq 9715
+ permit tcp any any eq 29260
+ permit tcp any any eq 9790
+ permit tcp any any eq 24960
+ permit tcp any any eq 25160
+ permit tcp any any eq 26060
+ permit tcp any any eq 24160
+ permit tcp any any eq 23060
+ permit tcp any any eq 13060
+ permit tcp any any eq 27160
+ permit tcp any any eq 13560
+ permit tcp any any eq 7001
+ permit tcp any 161.242.96.0 0.0.0.255 eq exec
+ permit tcp any host 161.242.218.28 eq www
+ deny   tcp any 161.242.4.0 0.0.0.255 eq www
+ deny   tcp 161.242.4.0 0.0.0.255 eq www any
+ permit tcp any 161.242.0.0 0.0.255.255 eq www
+ permit tcp 161.242.0.0 0.0.255.255 eq www any
+ip access-list extended BHC-ENHANCED
+ permit icmp any any precedence flash
+ permit tcp any any eq telnet
+ permit tcp any eq telnet any
+ permit tcp any any eq 1494
+ permit tcp any eq 1494 any
+ permit tcp any any eq 10560
+ permit tcp any any eq 4400
+ permit tcp any eq 4400 any
+ permit tcp any any eq 5900
+ permit tcp any eq 5900 any
+ permit tcp any any eq 5800
+ permit tcp any eq 5800 any
+ permit tcp any any eq tacacs
+ permit tcp any eq tacacs any
+ remark QoS Marking for Video Phones 
+ permit udp any any range 16384 32767 dscp af41
+ permit udp any range 16384 32767 any dscp af41
+ permit udp any any range 16384 32767 dscp cs4
+ permit udp any range 16384 32767 any dscp cs4
+ permit udp any any range 2326 2487 dscp af41
+ permit udp any range 2326 2487 any dscp af41
+ permit udp any any range 970 973
+ permit udp any any range 21000 21900
+ permit udp any range 21000 21900 any
+ permit udp any any range 50000 52399
+ permit udp any range 50000 52399 any
+ permit udp any any eq 5445
+ permit udp any eq 5445 any
+ permit tcp any any eq bgp
+ permit tcp any eq bgp any
+ permit eigrp any any
+ip access-list extended BHC-PREMIUM
+ permit icmp any any precedence critical
+ permit udp any 161.242.13.0 0.0.0.255 range 16384 32764
+ permit udp any 161.242.254.0 0.0.0.255 range 16384 32764
+ permit udp any 161.242.193.0 0.0.0.255 range 16384 32764
+ permit udp any any range 16384 32767 dscp ef
+ permit udp any range 16384 32767 any dscp ef
+ remark QoS Marking for Signaling
+ remark Cisco SCCP 
+ permit tcp any any range 2000 2002
+ permit tcp any range 2000 2002 any
+ remark Cisco H323 
+ permit udp any any eq 1300
+ permit udp any eq 1300 any
+ permit tcp any any eq 1300
+ permit tcp any eq 1300 any
+ permit udp any any eq 11720
+ permit udp any eq 11720 any
+ permit tcp any any range 11000 11999
+ permit tcp any range 11000 11999 any
+ permit tcp any any range 1718 1720
+ permit tcp any range 1718 1720 any
+ permit udp any any range 1718 1720
+ permit udp any range 1718 1720 any
+ permit udp any any eq 2837
+ permit udp any eq 2837 any
+ remark Cisco H.245 
+ permit tcp any any range 12100 12115
+ permit tcp any range 12100 12115 any
+ permit tcp any any range 5555 5599
+ permit tcp any range 5555 5599 any
+ permit udp any any eq 2776
+ permit udp any eq 2776 any
+ permit udp any any range 2776 2777
+ permit udp any range 2776 2777 any
+ remark Cisco SIP
+ permit tcp any any range 5060 5061
+ permit tcp any range 5060 5061 any
+ permit udp any any range 5060 5061
+ permit udp any range 5060 5061 any
+ remark Cisco RTSP 
+ permit tcp any any eq 1755
+ permit tcp any eq 1755 any
+ permit tcp any any eq 554
+ permit tcp any eq 554 any
+ip access-list extended candres
+ permit tcp host 172.23.211.2 host 10.254.34.6
+ permit tcp host 10.254.34.6 host 172.23.211.2
+ permit icmp any host 10.254.34.6
+!
+!
+ip prefix-list BOTHELL_Local seq 1 permit 10.240.51.0/24 le 32
+ip prefix-list BOTHELL_Local seq 2 permit 10.240.52.0/22 le 32
+ip prefix-list BOTHELL_Local seq 3 permit 10.241.51.0/24 le 32
+ip prefix-list BOTHELL_Local seq 4 permit 10.241.52.0/22 le 32
+ip prefix-list BOTHELL_Local seq 5 permit 10.242.51.0/24 le 32
+ip prefix-list BOTHELL_Local seq 6 permit 10.242.52.0/22 le 32
+ip prefix-list BOTHELL_Local seq 7 permit 10.243.51.0/24 le 32
+ip prefix-list BOTHELL_Local seq 8 permit 10.243.52.0/22 le 32
+ip prefix-list BOTHELL_Local seq 9 permit 172.23.208.0/22 le 32
+ip prefix-list BOTHELL_Local seq 10 permit 172.25.12.0/24 le 32
+ip prefix-list BOTHELL_Local seq 11 permit 192.168.11.0/24
+ip prefix-list BOTHELL_Local seq 12 permit 10.241.136.16/28
+ip prefix-list BOTHELL_Local seq 13 permit 10.240.56.0/23 le 32
+ip prefix-list BOTHELL_Local seq 14 permit 10.241.56.0/24 le 32
+ip prefix-list BOTHELL_Local seq 15 permit 10.242.56.0/24 le 32
+ip prefix-list BOTHELL_Local seq 16 permit 172.25.12.128/26 le 32
+ip prefix-list BOTHELL_Local seq 20 permit 10.108.0.0/18
+ip prefix-list BOTHELL_Local seq 25 permit 10.146.0.0/19
+ip prefix-list BOTHELL_Local seq 100 deny 0.0.0.0/0 le 32
+!
+ip prefix-list Inbound seq 2 deny 10.240.51.0/24 le 32
+ip prefix-list Inbound seq 3 deny 10.240.52.0/22 le 32
+ip prefix-list Inbound seq 4 deny 10.241.51.0/24 le 32
+ip prefix-list Inbound seq 5 deny 10.241.52.0/22 le 32
+ip prefix-list Inbound seq 6 deny 10.242.51.0/24 le 32
+ip prefix-list Inbound seq 7 deny 10.242.52.0/22 le 32
+ip prefix-list Inbound seq 8 deny 10.243.51.0/24 le 32
+ip prefix-list Inbound seq 9 deny 10.243.52.0/22 le 32
+ip prefix-list Inbound seq 10 deny 172.23.208.0/24 le 32
+ip prefix-list Inbound seq 11 deny 172.25.12.0/24 le 32
+ip prefix-list Inbound seq 12 deny 192.168.11.0/24
+ip prefix-list Inbound seq 13 deny 172.23.208.0/22 le 32
+ip prefix-list Inbound seq 999 permit 0.0.0.0/0 le 32
+!
+ip prefix-list Outbound seq 2 permit 10.240.51.0/24 le 32
+ip prefix-list Outbound seq 3 permit 10.240.52.0/22 le 32
+ip prefix-list Outbound seq 4 permit 10.241.51.0/24 le 32
+ip prefix-list Outbound seq 5 permit 10.241.52.0/22 le 32
+ip prefix-list Outbound seq 6 permit 10.242.51.0/24 le 32
+ip prefix-list Outbound seq 7 permit 10.242.52.0/22 le 32
+ip prefix-list Outbound seq 8 permit 10.243.51.0/24 le 32
+ip prefix-list Outbound seq 9 permit 10.243.52.0/22 le 32
+ip prefix-list Outbound seq 10 permit 172.23.208.0/22 le 32
+ip prefix-list Outbound seq 11 permit 172.25.12.0/24 le 32
+ip prefix-list Outbound seq 12 permit 192.168.11.0/24
+ip prefix-list Outbound seq 13 permit 10.241.136.16/28
+ip prefix-list Outbound seq 14 permit 10.240.56.0/23 le 32
+ip prefix-list Outbound seq 15 permit 10.241.56.0/24 le 32
+ip prefix-list Outbound seq 16 permit 10.242.56.0/24 le 32
+ip prefix-list Outbound seq 17 permit 172.25.12.128/26 le 32
+ip prefix-list Outbound seq 999 deny 0.0.0.0/0 le 32
+!
+ip prefix-list RouteFlexPL seq 10 permit 161.242.68.148/32
+ip prefix-list RouteFlexPL seq 20 permit 161.242.57.66/32
+!
+route-map FlexVPN-Prepend permit 10
+ set as-path prepend 65021 65021 65021
+!
+route-map SDWAN-RT1_in permit 10
+ match community SDWAN_filter
+ set local-preference 110
+!
+route-map SDWAN-RT1_in permit 20
+!
+route-map SCTIORouteFlexRM permit 10
+ match ip address prefix-list RouteFlexPL
+ set local-preference 200
+!
+route-map SCTIORouteFlexRM permit 50
+!
+route-map PREFER-PATH permit 10
+ match as-path 10
+ set as-path prepend 65072 65072
+!
+route-map PREFER-PATH permit 20
+!
+route-map NJIORouteFlexRM permit 10
+ match ip address prefix-list RouteFlexPL
+ set local-preference 250
+!
+route-map NJIORouteFlexRM permit 50
+!
+route-map BOTHELL_SDWAN_out permit 10
+ match ip address prefix-list BOTHELL_Local
+ set community 202:21
+!
+!
+snmp-server community tasTesGreat RO 41
+snmp-server community les$Filling RW 30
+snmp-server community bZyrH94$@! RO LUMEN_10
+snmp-server community C0ll3ctMe$ RO 80
+snmp-server ifindex persist
+snmp-server trap-source Loopback0
+snmp-server source-interface informs Loopback0
+snmp-server packetsize 8192
+snmp-server location 2FLOOR MDF. RACK01. Bothell WA
+snmp-server contact noc@valeant.com +1.855.891.1604
+tacacs server TACACS_am-njio-ise-psn1
+ address ipv4 161.242.71.121
+ key 7 123B2D345F3F0D070B08176538303B52
+tacacs server TACACS_am-sctio-ise-psn2
+ address ipv4 161.242.87.121
+ key 7 123B2D345F3F0D070B08176538303B52
+access-list 23 permit 10.10.10.0 0.0.0.7
+access-list 30 remark --LiveAction-SNMP-ACCESS--
+access-list 30 permit 161.242.218.59
+access-list 30 permit 10.252.40.60
+access-list 41 permit 10.0.16.24
+access-list 41 permit 10.228.236.14
+access-list 41 permit 161.242.54.124
+access-list 41 permit 10.252.64.170
+access-list 41 permit 10.0.16.60
+access-list 41 permit 161.242.88.62
+access-list 41 permit 172.23.211.82
+access-list 41 permit 161.242.68.45
+access-list 41 permit 161.242.74.38
+access-list 41 permit 161.242.56.46
+access-list 41 permit 161.242.57.38
+access-list 41 permit 161.242.56.37
+access-list 41 permit 161.242.56.36
+access-list 41 permit 161.242.95.92
+access-list 41 permit 161.242.61.57
+access-list 41 permit 10.36.12.122
+access-list 41 permit 10.36.12.120
+access-list 41 permit 10.243.167.5
+access-list 41 permit 161.242.56.48
+access-list 41 permit 161.242.61.53
+access-list 41 permit 161.242.32.47
+access-list 41 permit 161.242.100.80
+access-list 41 permit 10.243.154.21
+access-list 41 permit 10.252.20.107
+access-list 41 permit 10.240.101.21
+access-list 41 permit 161.242.68.153
+access-list 41 permit 161.242.68.152
+access-list 41 permit 10.243.107.14
+access-list 41 permit 161.242.141.111
+access-list 41 permit 161.242.92.188
+access-list 41 permit 161.242.92.187
+access-list 41 permit 10.243.165.157
+access-list 41 permit 161.242.53.160
+access-list 41 permit 10.243.43.21
+access-list 41 permit 161.242.53.161
+access-list 41 permit 161.242.68.221
+access-list 41 permit 161.242.68.220
+access-list 41 permit 161.242.68.196
+access-list 41 permit 10.252.66.97
+access-list 41 permit 10.243.44.14
+access-list 41 permit 10.252.65.83
+access-list 41 permit 161.242.98.204
+access-list 80 remark --CiscoCollector-SNMP-ACCESS--
+access-list 80 permit 161.242.68.66
+access-list 122 permit tcp 10.240.0.0 0.0.255.255 any eq 22
+access-list 122 permit tcp 10.252.0.0 0.0.255.255 any eq 22
+access-list 122 permit tcp 161.242.0.0 0.0.255.255 any eq 22
+access-list 122 permit tcp 10.254.0.0 0.0.255.255 any eq 22
+access-list 122 permit tcp 10.248.0.0 0.1.255.255 any eq 22
+access-list 122 permit tcp 10.228.0.0 0.0.255.255 any eq 22
+!
+!
+!
+control-plane
+!
+!
+alias exec c config t
+alias exec si sho ip int brie
+alias exec sib sho ip bgp
+alias exec sibs sho ip bgp summ
+alias exec cdp sho cdp neigh
+alias exec sir sho ip route
+banner motd ^CCc
+***********************************************************************
+**                                                                   **
+**                 Bothell WA - $(hostname)                     **
+**                                                                   **
+***********************************************************************
+**      THIS SYSTEM IS RESTRICTED TO AUTHORIZED USERS ONLY.          **
+**    INDIVIDUALS ATTEMPTING UNAUTHORIZED ACCESS MAY BE SUBJECT      **
+**    TO DISCIPLINARY ACTION UP TO AND INCLUDING TERMINATION         **
+**    AND/OR CIVIL OR CRIMINAL PROSECUTION.                          **
+**                                                                   **
+**             IF UNAUTHORIZED, TERMINATE ACCESS NOW!                **
+***********************************************************************
+**           Report problems by dialing +1.855.891.1604              **
+**                 noc@valeant.com noc@bausch.com                    **
+***********************************************************************
+^C
+!
+line con 0
+ session-timeout 5 
+ exec-timeout 15 0
+ password 7 0340681E165D731A
+ logging synchronous
+ login authentication BHC
+ transport output ssh
+ stopbits 1
+line aux 0
+ transport output ssh
+ stopbits 1
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ session-timeout 30 
+ access-class VTY_ACCESS in
+ exec-timeout 30 0
+ privilege level 15
+ password 7 030F5E0E165F3458
+ authorization commands 0 BHC
+ authorization commands 1 BHC
+ authorization commands 7 BHC
+ authorization commands 15 BHC
+ authorization exec BHC
+ logging synchronous
+ login authentication BHC
+ transport preferred ssh
+ transport input ssh
+ transport output ssh
+line vty 5 15
+ session-timeout 30 
+ access-class VTY_ACCESS in
+ exec-timeout 30 0
+ privilege level 15
+ password 7 030F5E0E165F3458
+ authorization commands 0 BHC
+ authorization commands 1 BHC
+ authorization commands 7 BHC
+ authorization commands 15 BHC
+ authorization exec BHC
+ logging synchronous
+ login authentication BHC
+ transport preferred none
+ transport input ssh
+ transport output ssh
+!
+scheduler allocate 20000 1000
+ntp server 161.242.71.8 prefer
+ntp server 10.0.1.8
+!
+end
+
+sh int status
+
+sh ip int bri
+Interface                  IP-Address      OK? Method Status                Protocol
+Embedded-Service-Engine0/0 unassigned      YES NVRAM  administratively down down    
+GigabitEthernet0/0         unassigned      YES NVRAM  up                    up      
+GigabitEthernet0/0.989     172.20.180.165  YES NVRAM  up                    up      
+GigabitEthernet0/0.990     172.20.180.173  YES NVRAM  up                    up      
+GigabitEthernet0/1         unassigned      YES NVRAM  up                    up      
+GigabitEthernet0/2         unassigned      YES NVRAM  up                    up      
+Loopback0                  172.25.12.249   YES NVRAM  up                    up      
+Port-channel12             172.25.12.100   YES NVRAM  up                    up      
+Tunnel1                    172.29.1.14     YES NVRAM  administratively down down    
+Tunnel2                    172.29.2.14     YES NVRAM  administratively down down    
+Virtual-Template1          172.29.1.14     YES unset  up                    down    
+Virtual-Template2          172.29.1.14     YES unset  administratively down down    
+sh vlan
+% Ambiguous command:  "sh vlan"
+sh ver
+Cisco IOS Software, C3900 Software (C3900-UNIVERSALK9-M), Version 15.4(3)M1, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2014 by Cisco Systems, Inc.
+Compiled Sat 25-Oct-14 07:15 by prod_rel_team
+
+ROM: System Bootstrap, Version 15.0(1r)M16, RELEASE SOFTWARE (fc1)
+
+AM-BOT-A01-R01 uptime is 28 weeks, 1 day, 10 hours, 8 minutes
+System returned to ROM by power-on
+System restarted at 10:44:12 PST Thu Nov 21 2024
+System image file is "flash0:c3900-universalk9-mz.SPA.154-3.M1.bin"
+Last reload type: Normal Reload
+Last reload reason: power-on
+
+
+
+This product contains cryptographic features and is subject to United
+States and local country laws governing import, export, transfer and
+use. Delivery of Cisco cryptographic products does not imply
+third-party authority to import, export, distribute or use encryption.
+Importers, exporters, distributors and users are responsible for
+compliance with U.S. and local country laws. By using this product you
+agree to comply with applicable laws and regulations. If you are unable
+to comply with U.S. and local laws, return this product immediately.
+
+A summary of U.S. laws governing Cisco cryptographic products may be found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to
+export@cisco.com.
+
+Cisco CISCO3945-CHASSIS (revision 1.0) with C3900-SPE150/K9 with 987136K/61440K bytes of memory.
+Processor board ID FTX1849AL93
+3 Gigabit Ethernet interfaces
+1 terminal line
+1 Virtual Private Network (VPN) Module
+DRAM configuration is 72 bits wide with parity enabled.
+255K bytes of non-volatile configuration memory.
+255488K bytes of ATA System CompactFlash 0 (Read/Write)
+
+
+License Info:
+
+License UDI:
+
+-------------------------------------------------
+Device#	  PID			SN
+-------------------------------------------------
+*1  	  C3900-SPE150/K9       FOC18441U8J     
+
+
+
+Technology Package License Information for Module:'c3900' 
+
+------------------------------------------------------------------------
+Technology    Technology-package                  Technology-package
+              Current              Type           Next reboot  
+------------------------------------------------------------------------
+ipbase        ipbasek9             Permanent      ipbasek9
+security      securityk9           Permanent      securityk9
+uc            None                 None           None
+data          None                 None           None
+NtwkEss       None                 None           None
+CollabPro     None                 None           None
+
+Configuration register is 0x2102
+
+sh inventory
+NAME: "CISCO3945-CHASSIS", DESCR: "CISCO3945-CHASSIS"
+PID: CISCO3945-CHASSIS , VID: V02, SN: FTX1849AL93
+
+NAME: "Cisco Services Performance Engine 150 for Cisco 3900 ISR on Slot 0", DESCR: "Cisco Services Performance Engine 150 for Cisco 3900 ISR"
+PID: C3900-SPE150/K9   , VID: V06 , SN: FOC18441U8J
+
+NAME: "C3900 AC Power Supply 1", DESCR: "C3900 AC Power Supply 1"
+PID: PWR-3900-AC       , VID: V04 , SN: QCS18391CS1
+
+
+sh mod
+% Incomplete command.
+
+sh mac address-table
+                             ^
+% Invalid input detected at '^' marker.
+
+sh arp
+Protocol  Address          Age (min)  Hardware Addr   Type   Interface
+Internet  172.20.180.162          4   0090.0bb3.de30  ARPA   GigabitEthernet0/0.989
+Internet  172.20.180.163         10   0090.0bb3.d880  ARPA   GigabitEthernet0/0.989
+Internet  172.20.180.165          -   d46d.50a0.2e80  ARPA   GigabitEthernet0/0.989
+Internet  172.20.180.173          -   d46d.50a0.2e80  ARPA   GigabitEthernet0/0.990
+Internet  172.25.12.1           237   0000.0c9f.f005  ARPA   Port-channel12
+Internet  172.25.12.2            12   547f.ee9a.d13c  ARPA   Port-channel12
+Internet  172.25.12.3             0   547f.ee9a.d17c  ARPA   Port-channel12
+Internet  172.25.12.4           226   e089.9d14.38c7  ARPA   Port-channel12
+Internet  172.25.12.10           93   588d.09ce.072f  ARPA   Port-channel12
+Internet  172.25.12.20          190   64f6.9d2d.203f  ARPA   Port-channel12
+Internet  172.25.12.21           93   64f6.9d2d.1fbf  ARPA   Port-channel12
+Internet  172.25.12.22           44   64f6.9d1e.f3bf  ARPA   Port-channel12
+Internet  172.25.12.23          181   64f6.9d1e.f4bf  ARPA   Port-channel12
+Internet  172.25.12.24          134   4c71.0c0b.cf47  ARPA   Port-channel12
+Internet  172.25.12.28          119   001d.7050.93b7  ARPA   Port-channel12
+Internet  172.25.12.50          240   a8b1.d44b.6941  ARPA   Port-channel12
+Internet  172.25.12.55            0   1005.ca2a.7d5c  ARPA   Port-channel12
+Internet  172.25.12.57            0   881d.fc41.6db8  ARPA   Port-channel12
+Internet  172.25.12.59            0   881d.fcdf.ca58  ARPA   Port-channel12
+Internet  172.25.12.61            0   a0ec.f98d.5164  ARPA   Port-channel12
+Internet  172.25.12.100           -   d46d.50a0.2e81  ARPA   Port-channel12
+Internet  172.25.12.105           0   a0ec.f99c.c478  ARPA   Port-channel12
+Internet  172.25.12.110         194   0000.0c9f.f006  ARPA   Port-channel12
+Internet  172.25.12.114           0   a0ec.f99c.c5b4  ARPA   Port-channel12
+Internet  172.25.12.115           0   a0ec.f973.1874  ARPA   Port-channel12
+sh cdp neighbors
+Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
+                  S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone, 
+                  D - Remote, C - CVTA, M - Two-port Mac Relay 
+
+Device ID        Local Intrfce     Holdtme    Capability  Platform  Port ID
+AM-BOT-A01-5K2.valeant.corp.vrx(SSI160904SQ)
+                 Gig 0/2           142             S I C  N5K-C5548 Eth 101/1/43
+AM-BOT-A01-5K1.valeant.corp.vrx(SSI160904XC)
+                 Gig 0/1           157             S I C  N5K-C5548 Eth 102/1/43
+AM-BOT-W01-SW2-L3-Internet.medicis.com
+                 Gig 0/0           131             R S I  WS-C3560E Gig 0/33
+
+Total cdp entries displayed : 3
+sh ip protocols
+*** IP Routing is NSF aware ***
+
+Routing Protocol is "application"
+  Sending updates every 0 seconds
+  Invalid after 0 seconds, hold down 0, flushed after 0
+  Outgoing update filter list for all interfaces is not set
+  Incoming update filter list for all interfaces is not set
+  Maximum path: 32
+  Routing for Networks:
+  Routing Information Sources:
+    Gateway         Distance      Last Update
+  Distance: (default is 4)
+
+Routing Protocol is "nhrp"
+  Maximum path: 32
+  Routing Information Sources:
+    Gateway         Distance      Last Update
+  Distance: (default is 250)
+
+Routing Protocol is "eigrp 251"
+  Outgoing update filter list for all interfaces is not set
+  Incoming update filter list for all interfaces is not set
+  Default networks flagged in outgoing updates
+  Default networks accepted from incoming updates
+  Redistributing: bgp 65021
+  EIGRP-IPv4 Protocol for AS(251)
+    Metric weight K1=1, K2=0, K3=1, K4=0, K5=0
+    NSF-aware route hold timer is 240
+    Router-ID: 172.25.12.249
+    Topology : 0 (base) 
+      Active Timer: 3 min
+      Distance: internal 90 external 170
+      Maximum path: 4
+      Maximum hopcount 100
+      Maximum metric variance 1
+
+  Automatic Summarization: disabled
+  Maximum path: 4
+  Routing for Networks:
+    172.25.12.100/32
+    172.25.12.0/25
+    172.25.12.249/32
+  Routing Information Sources:
+    Gateway         Distance      Last Update
+    172.25.12.28          90      07:58:04
+    172.25.12.3           90      07:57:09
+    172.25.12.2           90      07:57:09
+    172.25.12.4           90      07:58:04
+  Distance: internal 90 external 170
+
+Routing Protocol is "bgp 65021"
+  Outgoing update filter list for all interfaces is not set
+  Incoming update filter list for all interfaces is not set
+  IGP synchronization is disabled
+  Automatic route summarization is disabled
+  Redistributing: eigrp 251
+  Neighbor(s):
+    Address          FiltIn FiltOut DistIn DistOut Weight RouteMap
+    172.20.128.117                                       
+    172.20.129.102                                       
+    172.20.180.162                                        SDWAN-RT1_in
+    172.20.180.163                                        SDWAN-RT1_in
+    172.29.1.1                                            SCTIORouteFlexRM
+    172.29.2.1                                            NJIORouteFlexRM
+  Maximum path: 1
+  Routing Information Sources:
+    Gateway         Distance      Last Update
+    172.20.180.162        20      04:47:01
+    172.20.180.163       200      04:47:16
+  Distance: external 20 internal 200 local 200
+
+sh ip route
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+       a - application route
+       + - replicated route, % - next hop override
+
+Gateway of last resort is 172.25.12.3 to network 0.0.0.0
+
+D*EX  0.0.0.0/0 [170/3328] via 172.25.12.3, 1d08h, Port-channel12
+                [170/3328] via 172.25.12.2, 1d08h, Port-channel12
+D EX  0.0.0.0/1 [170/3328] via 172.25.12.3, 07:57:11, Port-channel12
+                [170/3328] via 172.25.12.2, 07:57:11, Port-channel12
+      4.0.0.0/32 is subnetted, 1 subnets
+D EX     4.2.2.1 [170/3328] via 172.25.12.3, 2w5d, Port-channel12
+                 [170/3328] via 172.25.12.2, 2w5d, Port-channel12
+      8.0.0.0/32 is subnetted, 2 subnets
+D EX     8.8.4.4 [170/51456] via 172.25.12.3, 7w0d, Port-channel12
+                 [170/51456] via 172.25.12.2, 7w0d, Port-channel12
+D EX     8.8.8.8 [170/3328] via 172.25.12.3, 2w5d, Port-channel12
+                 [170/3328] via 172.25.12.2, 2w5d, Port-channel12
+      10.0.0.0/8 is variably subnetted, 294 subnets, 17 masks
+B        10.0.0.0/8 [20/0] via 172.20.180.162, 7w0d
+B        10.0.1.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.0.1.0/30 [20/21] via 172.20.180.162, 1w1d
+B        10.0.2.0/30 [20/2] via 172.20.180.162, 1w1d
+B        10.0.3.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.0.8.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.1.0.0/20 [20/3072] via 172.20.180.162, 1d21h
+B        10.1.79.0/24 [20/3072] via 172.20.180.162, 1d21h
+B        10.2.9.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.3.1.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.3.100.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.4.12.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.10.0.0/16 [20/50] via 172.20.180.162, 7w0d
+B        10.10.10.13/32 [20/20] via 172.20.180.162, 04:47:04
+B        10.10.10.14/32 [20/20] via 172.20.180.162, 04:47:06
+B        10.10.10.15/32 [20/20] via 172.20.180.162, 04:47:06
+B        10.16.0.0/16 [20/2] via 172.20.180.162, 6d08h
+B        10.18.0.0/16 [20/0] via 172.20.180.162, 1w1d
+B        10.33.4.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.33.10.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.33.11.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.33.12.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.33.13.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.33.14.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.33.15.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.35.1.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.35.3.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.35.98.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.35.99.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.36.1.0/24 [20/20] via 172.20.180.162, 7w0d
+B        10.36.3.0/24 [20/20] via 172.20.180.162, 7w0d
+B        10.36.4.0/24 [20/20] via 172.20.180.162, 7w0d
+B        10.36.6.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.36.10.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.36.12.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.36.13.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.36.14.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.36.15.0/27 [20/50] via 172.20.180.162, 7w0d
+B        10.36.15.32/27 [20/50] via 172.20.180.162, 7w0d
+B        10.36.15.64/27 [20/50] via 172.20.180.162, 7w0d
+B        10.36.19.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.36.87.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.36.88.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.36.90.0/27 [20/50] via 172.20.180.162, 7w0d
+B        10.36.90.64/27 [20/50] via 172.20.180.162, 7w0d
+D EX     10.108.0.0/18 [170/51456] via 172.25.12.3, 7w0d, Port-channel12
+                       [170/51456] via 172.25.12.2, 7w0d, Port-channel12
+D        10.108.63.224/27 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                          [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+B        10.108.64.0/18 [20/3072] via 172.20.180.162, 7w0d
+B        10.108.128.0/18 [20/3072] via 172.20.180.162, 1d21h
+B        10.108.192.0/18 [20/20] via 172.20.180.162, 1w1d
+B        10.109.0.0/18 [20/20] via 172.20.180.162, 6d08h
+B        10.109.64.0/18 [20/20] via 172.20.180.162, 04:47:04
+B        10.109.128.0/18 [20/0] via 172.20.180.162, 5w1d
+B        10.111.254.0/24 [20/80] via 172.20.180.162, 2w3d
+B        10.111.255.0/24 [20/80] via 172.20.180.162, 7w0d
+B        10.112.0.0/18 [20/1762048] via 172.20.180.162, 6d17h
+B        10.112.64.0/18 [20/640256] via 172.20.180.162, 7w0d
+B        10.112.128.0/18 [20/1331456] via 172.20.180.162, 4d08h
+B        10.112.192.0/18 [20/1762048] via 172.20.180.162, 7w0d
+B        10.115.255.0/24 [20/1762048] via 172.20.180.162, 6d17h
+B        10.127.2.128/26 [20/80] via 172.20.180.162, 2w3d
+B        10.127.3.0/24 [20/80] via 172.20.180.162, 2w3d
+B        10.144.128.0/17 [20/80] via 172.20.180.162, 7w0d
+B        10.144.128.0/22 [20/2816] via 172.20.180.162, 2w2d
+B        10.144.144.0/20 [20/0] via 172.20.180.162, 3d03h
+B        10.144.160.0/20 [20/0] via 172.20.180.162, 5w3d
+B        10.144.176.0/20 [20/0] via 172.20.180.162, 4d03h
+B        10.144.192.0/20 [20/0] via 172.20.180.162, 6w2d
+B        10.144.207.0/28 [20/0] via 172.20.180.162, 6w2d
+D EX     10.146.0.0/19 [170/51456] via 172.25.12.3, 7w0d, Port-channel12
+                       [170/51456] via 172.25.12.2, 7w0d, Port-channel12
+D        10.146.30.0/24 [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.146.31.0/24 [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+B        10.150.50.136/30 [20/0] via 172.20.180.162, 1d21h
+B        10.150.50.208/29 [20/3072] via 172.20.180.162, 7w0d
+B        10.174.0.0/16 [20/0] via 172.20.180.162, 2w3d
+B        10.174.0.0/17 [20/1762048] via 172.20.180.162, 6d17h
+B        10.174.3.0/24 [20/3072] via 172.20.180.162, 1d06h
+B        10.174.17.0/24 [20/3072] via 172.20.180.162, 1d06h
+B        10.174.18.0/26 [20/0] via 172.20.180.162, 1d06h
+B        10.174.21.0/24 [20/3072] via 172.20.180.162, 1d06h
+B        10.174.36.0/22 [20/1762048] via 172.20.180.162, 7w0d
+B        10.174.40.0/22 [20/1762048] via 172.20.180.162, 7w0d
+B        10.174.56.0/21 [20/0] via 172.20.180.162, 7w0d
+B        10.174.64.0/22 [20/0] via 172.20.180.162, 7w0d
+B        10.174.72.0/22 [20/1762048] via 172.20.180.162, 7w0d
+B        10.174.104.0/24 [20/3072] via 172.20.180.162, 1d13h
+B        10.174.120.0/22 [20/0] via 172.20.180.162, 4d04h
+B        10.174.128.0/20 [20/0] via 172.20.180.162, 7w0d
+B        10.174.176.0/24 [20/0] via 172.20.180.162, 7w0d
+B        10.174.177.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.174.178.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.174.179.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.176.0.0/16 [20/0] via 172.20.180.162, 2w3d
+B        10.177.0.0/16 [20/0] via 172.20.180.162, 1w2d
+B        10.178.0.0/19 [20/0] via 172.20.180.162, 7w0d
+B        10.178.30.0/24 [20/0] via 172.20.180.162, 7w0d
+B        10.178.31.0/28 [20/0] via 172.20.180.162, 7w0d
+B        10.178.80.0/20 [20/0] via 172.20.180.162, 5w3d
+B        10.178.95.0/28 [20/0] via 172.20.180.162, 5w3d
+B        10.178.96.0/19 [20/2816] via 172.20.180.162, 7w0d
+B        10.178.128.0/19 [20/2816] via 172.20.180.162, 1d21h
+B        10.179.0.0/20 [20/0] via 172.20.180.162, 5w1d
+B        10.179.48.0/20 [20/0] via 172.20.180.162, 2d05h
+B        10.179.128.0/19 [20/0] via 172.20.180.162, 6d08h
+B        10.179.192.0/19 [20/0] via 172.20.180.162, 1w1d
+B        10.184.0.0/16 [20/1762048] via 172.20.180.162, 6d17h
+B        10.185.0.0/16 [20/0] via 172.20.180.162, 1d11h
+B        10.185.0.0/20 [20/2816] via 172.20.180.162, 7w0d
+B        10.185.48.0/20 [20/1762048] via 172.20.180.162, 7w0d
+B        10.185.64.0/20 [20/1762048] via 172.20.180.162, 6d12h
+B        10.185.80.0/20 [20/2816] via 172.20.180.162, 2w3d
+B        10.185.96.0/20 [20/2816] via 172.20.180.162, 6d17h
+B        10.185.128.0/20 [20/1762048] via 172.20.180.162, 7w0d
+B        10.185.144.0/20 [20/0] via 172.20.180.162, 4d04h
+B        10.185.160.0/20 [20/2816] via 172.20.180.162, 1d13h
+B        10.185.176.0/20 [20/1762048] via 172.20.180.162, 6d17h
+B        10.185.192.0/20 [20/1762048] via 172.20.180.162, 1d06h
+B        10.185.224.0/20 [20/1762048] via 172.20.180.162, 6d17h
+B        10.211.1.61/32 [20/80] via 172.20.180.162, 2w3d
+B        10.212.247.27/32 [20/80] via 172.20.180.162, 2w3d
+B        10.228.0.0/16 [20/0] via 172.20.180.162, 2w3d
+B        10.228.47.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.228.50.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.228.52.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.228.53.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.228.54.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.228.100.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.101.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.103.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.108.0/24 [20/20] via 172.20.180.162, 6d08h
+B        10.228.111.0/24 [20/20] via 172.20.180.162, 6d08h
+B        10.228.112.0/24 [20/20] via 172.20.180.162, 6d08h
+B        10.228.113.0/24 [20/20] via 172.20.180.162, 6d08h
+B        10.228.114.0/24 [20/20] via 172.20.180.162, 6d08h
+B        10.228.115.0/24 [20/20] via 172.20.180.162, 6d08h
+B        10.228.116.0/24 [20/20] via 172.20.180.162, 6d08h
+B        10.228.117.0/24 [20/2] via 172.20.180.162, 1w1d
+B        10.228.118.0/24 [20/2] via 172.20.180.162, 1w1d
+B        10.228.119.0/24 [20/2] via 172.20.180.162, 1w1d
+B        10.228.120.0/24 [20/2] via 172.20.180.162, 04:47:03
+B        10.228.121.0/24 [20/2] via 172.20.180.162, 04:47:06
+B        10.228.122.0/24 [20/2] via 172.20.180.162, 04:47:04
+B        10.228.123.0/24 [20/0] via 172.20.180.162, 04:47:02
+B        10.228.124.0/22 [20/256768] via 172.20.180.162, 7w0d
+B        10.228.124.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.125.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.126.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.127.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.128.0/23 [20/256768] via 172.20.180.162, 7w0d
+B        10.228.128.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.136.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.138.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.139.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.140.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.141.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.142.8/29 [20/0] via 172.20.180.162, 7w0d
+B        10.228.142.16/29 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.143.0/26 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.144.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.145.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.148.0/22 [20/3072] via 172.20.180.162, 7w0d
+B        10.228.168.0/22 [20/1762048] via 172.20.180.162, 6d17h
+B        10.228.172.0/24 [20/0] via 172.20.180.162, 2w3d
+B        10.228.176.0/20 [20/1762048] via 172.20.180.162, 6d17h
+B        10.228.192.0/23 [20/0] via 172.20.180.162, 4d08h
+B        10.228.194.0/24 [20/3072] via 172.20.180.162, 4d08h
+B        10.228.195.0/24 [20/3072] via 172.20.180.162, 4d08h
+B        10.228.196.0/24 [20/3072] via 172.20.180.162, 4d08h
+B        10.228.200.0/21 [20/1762048] via 172.20.180.162, 6d17h
+B        10.228.201.0/24 [20/3072] via 172.20.180.162, 6d17h
+B        10.228.208.0/22 [20/1762048] via 172.20.180.162, 6d17h
+B        10.228.212.0/24 [20/3072] via 172.20.180.162, 6d12h
+B        10.228.213.0/24 [20/3072] via 172.20.180.162, 6d12h
+B        10.228.214.0/24 [20/3072] via 172.20.180.162, 6d12h
+B        10.228.215.0/24 [20/3072] via 172.20.180.162, 6d12h
+B        10.228.216.0/22 [20/1762048] via 172.20.180.162, 6d17h
+B        10.228.220.0/22 [20/1331456] via 172.20.180.162, 5w3d
+B        10.228.224.0/22 [20/1762048] via 172.20.180.162, 6d17h
+B        10.228.240.0/22 [20/1762048] via 172.20.180.162, 6d17h
+B        10.228.244.0/22 [20/0] via 172.20.180.162, 6d17h
+B        10.228.250.0/24 [20/1762048] via 172.20.180.162, 6d17h
+B        10.228.251.0/24 [20/1762048] via 172.20.180.162, 6d17h
+B        10.228.252.0/24 [20/1762048] via 172.20.180.162, 6d17h
+B        10.230.0.0/16 [20/1762048] via 172.20.180.162, 6d17h
+B        10.233.36.244/32 [20/1762048] via 172.20.180.162, 6d17h
+B        10.233.36.245/32 [20/1762048] via 172.20.180.162, 6d17h
+B        10.233.36.246/32 [20/1762048] via 172.20.180.162, 6d17h
+B        10.233.36.247/32 [20/1762048] via 172.20.180.162, 6d17h
+B        10.233.36.248/32 [20/1762048] via 172.20.180.162, 6d17h
+B        10.233.36.249/32 [20/1762048] via 172.20.180.162, 6d17h
+B        10.233.36.250/32 [20/1762048] via 172.20.180.162, 6d17h
+B        10.235.0.0/26 [20/0] via 172.20.180.162, 7w0d
+B        10.235.0.64/27 [20/0] via 172.20.180.162, 7w0d
+B        10.235.0.128/25 [20/0] via 172.20.180.162, 04:47:06
+B        10.235.1.0/24 [20/0] via 172.20.180.162, 7w0d
+B        10.240.20.0/24 [20/0] via 172.20.180.162, 5w1d
+B        10.240.21.0/24 [20/0] via 172.20.180.162, 5w1d
+B        10.240.26.0/24 [20/0] via 172.20.180.162, 1w2d
+B        10.240.28.0/22 [20/80] via 172.20.180.162, 2w3d
+D        10.240.51.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.240.52.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.240.53.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.240.54.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.240.55.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.240.56.0/23 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+B        10.240.64.0/19 [20/0] via 172.20.180.162, 7w0d
+B        10.240.67.0/24 [20/0] via 172.20.180.162, 7w0d
+B        10.240.176.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        10.240.240.0/22 [20/3072] via 172.20.180.162, 1d21h
+B        10.241.21.0/24 [20/0] via 172.20.180.162, 5w1d
+B        10.241.22.0/24 [20/0] via 172.20.180.162, 5w1d
+B        10.241.23.0/24 [20/20] via 172.20.180.162, 6d08h
+B        10.241.26.0/24 [20/0] via 172.20.180.162, 1w2d
+D        10.241.51.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.241.52.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.241.53.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.241.54.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.241.55.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.241.56.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+B        10.241.64.0/19 [20/0] via 172.20.180.162, 7w0d
+D        10.241.136.16/28 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                          [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+B        10.241.136.160/28 [20/3072] via 172.20.180.162, 7w0d
+B        10.241.137.16/28 [20/3072] via 172.20.180.162, 1d21h
+B        10.241.137.32/28 [20/3072] via 172.20.180.162, 7w0d
+B        10.241.138.3/32 [20/80] via 172.20.180.162, 2w3d
+B        10.241.138.32/28 [20/50] via 172.20.180.162, 7w0d
+B        10.241.138.48/28 [20/50] via 172.20.180.162, 2w3d
+B        10.241.138.240/28 [20/0] via 172.20.180.162, 1w2d
+B        10.241.180.160/28 [20/0] via 172.20.180.162, 1w2d
+B        10.241.240.0/22 [20/3072] via 172.20.180.162, 1d21h
+B        10.242.21.0/24 [20/0] via 172.20.180.162, 2d05h
+B        10.242.26.0/24 [20/0] via 172.20.180.162, 1w2d
+D        10.242.51.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.242.52.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.242.53.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.242.54.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.242.55.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.242.56.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+B        10.242.64.0/19 [20/0] via 172.20.180.162, 7w0d
+B        10.242.240.0/22 [20/3072] via 172.20.180.162, 1d21h
+B        10.242.244.0/24 [20/50] via 172.20.180.162, 7w0d
+D        10.243.52.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        10.243.53.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                        [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+B        10.243.72.0/24 [20/0] via 172.20.180.162, 7w0d
+D EX     10.243.110.0/24 [170/51456] via 172.25.12.3, 7w0d, Port-channel12
+                         [170/51456] via 172.25.12.2, 7w0d, Port-channel12
+B        10.243.240.0/24 [20/3072] via 172.20.180.162, 1d21h
+B        10.247.0.0/18 [20/0] via 172.20.180.162, 2w2d
+B        10.248.222.0/23 [20/0] via 172.20.180.162, 08:41:17
+B        10.248.224.0/23 [20/3072] via 172.20.180.162, 08:41:19
+B        10.248.226.128/25 [20/3072] via 172.20.180.162, 08:41:16
+B        10.248.227.0/24 [20/3072] via 172.20.180.162, 08:41:17
+B        10.248.234.0/24 [20/1762048] via 172.20.180.162, 6d17h
+B        10.248.235.0/24 [20/1762048] via 172.20.180.162, 6d17h
+B        10.250.222.0/23 [20/3072] via 172.20.180.162, 08:41:19
+B        10.250.234.0/24 [20/1762048] via 172.20.180.162, 6d17h
+B        10.251.0.0/18 [20/1762048] via 172.20.180.162, 6d17h
+B        10.251.4.0/22 [20/0] via 172.20.180.162, 2w3d
+B        10.252.0.0/16 [20/0] via 172.20.180.162, 2w3d
+B        10.252.10.0/24 [20/50] via 172.20.180.162, 2w3d
+B        10.252.64.128/32 [20/0] via 172.20.180.162, 2w3d
+B        10.252.64.129/32 [20/0] via 172.20.180.162, 2w3d
+B        10.252.64.137/32 [20/0] via 172.20.180.162, 2w3d
+B        10.252.64.138/32 [20/0] via 172.20.180.162, 2w3d
+B        10.252.64.188/32 [20/0] via 172.20.180.162, 2w3d
+B        10.252.65.52/32 [20/0] via 172.20.180.162, 2w3d
+B        10.252.65.53/32 [20/0] via 172.20.180.162, 2w3d
+B        10.252.65.66/32 [20/0] via 172.20.180.162, 2w3d
+B        10.252.65.67/32 [20/0] via 172.20.180.162, 2w3d
+B        10.252.72.0/24 [20/50] via 172.20.180.162, 2w3d
+B        10.252.103.0/24 [20/80] via 172.20.180.162, 2w3d
+B        10.252.104.0/21 [20/80] via 172.20.180.162, 2w3d
+B        10.252.119.32/28 [20/60] via 172.20.180.162, 2w3d
+B        10.252.119.48/28 [20/60] via 172.20.180.162, 2w3d
+B        10.252.128.0/17 [20/0] via 172.20.180.162, 7w0d
+B        10.252.136.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.252.138.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.252.140.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.252.143.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.252.177.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.252.178.0/24 [20/20] via 172.20.180.162, 7w0d
+B        10.252.180.0/24 [20/50] via 172.20.180.162, 7w0d
+B        10.253.0.0/16 [20/0] via 172.20.180.162, 2w3d
+B        10.253.0.0/21 [20/0] via 172.20.180.162, 2w3d
+B        10.253.119.32/28 [20/70] via 172.20.180.162, 7w0d
+B        10.253.119.48/28 [20/70] via 172.20.180.162, 7w0d
+B        10.253.216.0/21 [20/0] via 172.20.180.162, 2w3d
+B        10.253.224.0/21 [20/0] via 172.20.180.162, 2w3d
+B        10.253.232.0/21 [20/0] via 172.20.180.162, 2w3d
+B        10.253.240.0/21 [20/0] via 172.20.180.162, 2w3d
+B        10.253.248.0/21 [20/0] via 172.20.180.162, 2w3d
+B        10.254.0.0/18 [20/70] via 172.20.180.162, 2w3d
+B        10.254.72.0/22 [20/0] via 172.20.180.162, 7w0d
+B        10.255.0.0/19 [20/70] via 172.20.180.162, 2w3d
+B        10.255.128.0/19 [20/70] via 172.20.180.162, 2w3d
+      68.0.0.0/28 is subnetted, 2 subnets
+B        68.177.240.0 [20/80] via 172.20.180.162, 2w3d
+B        68.177.241.0 [20/1762048] via 172.20.180.162, 6d17h
+      100.0.0.0/27 is subnetted, 2 subnets
+B        100.64.245.32 [20/80] via 172.20.180.162, 2w3d
+B        100.72.245.32 [20/80] via 172.20.180.162, 7w0d
+D EX  128.0.0.0/1 [170/3328] via 172.25.12.3, 07:57:11, Port-channel12
+                  [170/3328] via 172.25.12.2, 07:57:11, Port-channel12
+B     140.176.0.0/16 [20/1762048] via 172.20.180.162, 6d17h
+      157.206.0.0/16 is variably subnetted, 16 subnets, 3 masks
+B        157.206.48.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        157.206.148.0/22 [20/3072] via 172.20.180.162, 7w0d
+B        157.206.152.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        157.206.155.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        157.206.160.0/22 [20/3072] via 172.20.180.162, 7w0d
+B        157.206.164.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        157.206.165.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        157.206.166.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        157.206.167.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        157.206.169.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        157.206.174.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        157.206.175.0/24 [20/3072] via 172.20.180.162, 7w0d
+B        157.206.200.0/24 [20/3072] via 172.20.180.162, 1d21h
+B        157.206.201.0/24 [20/3072] via 172.20.180.162, 1d21h
+B        157.206.202.0/23 [20/3072] via 172.20.180.162, 1d21h
+B        157.206.206.0/23 [20/3072] via 172.20.180.162, 1d21h
+B     158.117.0.0/16 [20/1762048] via 172.20.180.162, 6d17h
+      161.242.0.0/16 is variably subnetted, 39 subnets, 3 masks
+B        161.242.55.0/24 [20/50] via 172.20.180.162, 2w3d
+B        161.242.56.0/24 [20/50] via 172.20.180.162, 2w3d
+B        161.242.56.202/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.56.204/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.56.205/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.57.0/24 [20/50] via 172.20.180.162, 2w3d
+B        161.242.57.20/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.57.21/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.57.66/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.61.158/32 [20/80] via 172.20.180.162, 2w3d
+B        161.242.61.159/32 [20/80] via 172.20.180.162, 2w3d
+B        161.242.67.0/24 [20/50] via 172.20.180.162, 2w3d
+B        161.242.68.0/24 [20/50] via 172.20.180.162, 2w3d
+B        161.242.68.13/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.68.69/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.68.81/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.68.82/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.68.96/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.68.148/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.69.0/24 [20/50] via 172.20.180.162, 2w3d
+B        161.242.69.30/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.70.0/24 [20/50] via 172.20.180.162, 2w3d
+B        161.242.71.0/24 [20/50] via 172.20.180.162, 2w3d
+B        161.242.71.54/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.71.55/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.71.56/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.71.57/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.71.58/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.71.74/32 [20/0] via 172.20.180.162, 2w3d
+B        161.242.84.0/24 [20/50] via 172.20.180.162, 2w3d
+B        161.242.87.0/24 [20/50] via 172.20.180.162, 7w0d
+B        161.242.92.0/24 [20/50] via 172.20.180.162, 7w0d
+B        161.242.96.0/24 [20/50] via 172.20.180.162, 7w0d
+S        161.242.97.254/32 [1/0] via 172.25.12.1
+B        161.242.98.0/23 [20/0] via 172.20.180.162, 7w0d
+B        161.242.106.0/24 [20/50] via 172.20.180.162, 7w0d
+B        161.242.130.0/24 [20/50] via 172.20.180.162, 7w0d
+B        161.242.131.0/24 [20/50] via 172.20.180.162, 7w0d
+B        161.242.133.0/24 [20/50] via 172.20.180.162, 7w0d
+B     165.89.0.0/16 [20/1762048] via 172.20.180.162, 6d17h
+B     172.16.0.0/12 [20/0] via 172.20.180.162, 7w0d
+      172.16.0.0/16 is variably subnetted, 15 subnets, 4 masks
+B        172.16.2.4/30 [20/2] via 172.20.180.162, 1w1d
+B        172.16.2.8/30 [20/2] via 172.20.180.162, 1w1d
+B        172.16.4.1/32 [20/20] via 172.20.180.162, 04:47:07
+B        172.16.5.0/25 [20/20] via 172.20.180.162, 6d08h
+B        172.16.6.0/25 [20/2] via 172.20.180.162, 04:47:06
+B        172.16.7.0/25 [20/2] via 172.20.180.162, 1w1d
+B        172.16.8.0/24 [20/2] via 172.20.180.162, 1w1d
+B        172.16.9.0/24 [20/12] via 172.20.180.162, 6d08h
+B        172.16.10.0/24 [20/12] via 172.20.180.162, 6d08h
+B        172.16.11.0/24 [20/20] via 172.20.180.162, 6d08h
+B        172.16.14.0/24 [20/12] via 172.20.180.162, 04:47:06
+B        172.16.15.0/24 [20/20] via 172.20.180.162, 6d08h
+B        172.16.60.0/24 [20/20] via 172.20.180.162, 04:47:04
+B        172.16.255.4/32 [20/2] via 172.20.180.162, 1w1d
+B        172.16.255.5/32 [20/2] via 172.20.180.162, 1w1d
+      172.18.0.0/16 is variably subnetted, 7 subnets, 3 masks
+B        172.18.18.56/29 [20/2] via 172.20.180.162, 04:47:05
+B        172.18.18.80/28 [20/3072] via 172.20.180.162, 7w0d
+B        172.18.19.0/27 [20/3072] via 172.20.180.162, 1d21h
+B        172.18.19.160/27 [20/3072] via 172.20.180.162, 1d21h
+B        172.18.19.192/27 [20/3072] via 172.20.180.162, 1d21h
+B        172.18.20.88/29 [20/1762048] via 172.20.180.162, 6d17h
+B        172.18.20.160/28 [20/1762048] via 172.20.180.162, 6d17h
+      172.19.0.0/24 is subnetted, 1 subnets
+B        172.19.9.0 [20/20] via 172.20.180.162, 04:47:06
+      172.20.0.0/16 is variably subnetted, 36 subnets, 3 masks
+B        172.20.146.32/30 [20/0] via 172.20.180.162, 7w0d
+B        172.20.173.200/29 [20/0] via 172.20.180.162, 5w3d
+B        172.20.180.0/29 [20/0] via 172.20.180.162, 2w3d
+B        172.20.180.24/29 [20/0] via 172.20.180.162, 7w0d
+B        172.20.180.40/29 [20/0] via 172.20.180.162, 6d12h
+B        172.20.180.48/29 [20/0] via 172.20.180.162, 7w0d
+B        172.20.180.72/29 [20/0] via 172.20.180.162, 1d06h
+B        172.20.180.88/29 [20/0] via 172.20.180.162, 7w0d
+B        172.20.180.104/29 [20/0] via 172.20.180.162, 4d04h
+B        172.20.180.120/29 [20/0] via 172.20.180.162, 7w0d
+B        172.20.180.136/29 [20/0] via 172.20.180.162, 1d21h
+B        172.20.180.144/29 [20/0] via 172.20.180.162, 4d08h
+C        172.20.180.160/29 is directly connected, GigabitEthernet0/0.989
+L        172.20.180.165/32 is directly connected, GigabitEthernet0/0.989
+C        172.20.180.168/29 is directly connected, GigabitEthernet0/0.990
+L        172.20.180.173/32 is directly connected, GigabitEthernet0/0.990
+B        172.20.180.192/29 [20/0] via 172.20.180.162, 7w0d
+B        172.20.180.208/29 [20/0] via 172.20.180.162, 1d13h
+B        172.20.180.240/29 [20/0] via 172.20.180.162, 6d08h
+B        172.20.181.0/29 [20/0] via 172.20.180.162, 7w0d
+B        172.20.181.16/29 [20/0] via 172.20.180.162, 6d17h
+B        172.20.181.32/29 [20/0] via 172.20.180.162, 5w1d
+B        172.20.181.48/29 [20/0] via 172.20.180.162, 2d05h
+B        172.20.181.64/29 [20/0] via 172.20.180.162, 04:47:04
+B        172.20.181.80/29 [20/0] via 172.20.180.162, 6w2d
+B        172.20.181.104/29 [20/0] via 172.20.180.162, 7w0d
+B        172.20.181.120/29 [20/0] via 172.20.180.162, 08:41:18
+B        172.20.181.136/29 [20/0] via 172.20.180.162, 2w3d
+B        172.20.181.152/29 [20/0] via 172.20.180.162, 7w0d
+B        172.20.181.168/29 [20/0] via 172.20.180.162, 2w2d
+B        172.20.181.184/29 [20/0] via 172.20.180.162, 1w2d
+B        172.20.181.200/29 [20/0] via 172.20.180.162, 1w2d
+B        172.20.181.216/29 [20/0] via 172.20.180.162, 5w3d
+B        172.20.181.232/29 [20/0] via 172.20.180.162, 3d03h
+B        172.20.181.248/29 [20/0] via 172.20.180.162, 4d03h
+B        172.20.182.8/29 [20/0] via 172.20.180.162, 5w3d
+      172.22.0.0/32 is subnetted, 1 subnets
+B        172.22.16.11 [20/21] via 172.20.180.162, 1w1d
+      172.23.0.0/24 is subnetted, 4 subnets
+D        172.23.208.0 [90/3072] via 172.25.12.4, 7w0d, Port-channel12
+                      [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                      [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        172.23.209.0 [90/3072] via 172.25.12.4, 7w0d, Port-channel12
+                      [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                      [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        172.23.210.0 [90/3072] via 172.25.12.4, 7w0d, Port-channel12
+                      [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                      [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D        172.23.211.0 [90/3072] via 172.25.12.4, 7w0d, Port-channel12
+                      [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                      [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+      172.24.0.0/16 is variably subnetted, 8 subnets, 2 masks
+B        172.24.219.24/30 [20/0] via 172.20.180.162, 7w0d
+B        172.24.219.60/30 [20/130816] via 172.20.180.162, 6d17h
+B        172.24.219.117/32 [20/0] via 172.20.180.162, 7w0d
+B        172.24.219.120/30 [20/256768] via 172.20.180.162, 7w0d
+B        172.24.219.180/30 [20/0] via 172.20.180.162, 6d08h
+B        172.24.219.197/32 [20/0] via 172.20.180.162, 1d21h
+B        172.24.219.205/32 [20/1762048] via 172.20.180.162, 6d17h
+B        172.24.219.220/30 [20/1762048] via 172.20.180.162, 6d17h
+      172.25.0.0/16 is variably subnetted, 24 subnets, 6 masks
+B        172.25.8.0/24 [20/0] via 172.20.180.162, 7w0d
+B        172.25.10.0/24 [20/0] via 172.20.180.162, 2w3d
+B        172.25.10.1/32 [20/11] via 172.20.180.162, 2w3d
+B        172.25.10.2/32 [20/51] via 172.20.180.162, 2w3d
+B        172.25.10.240/29 [20/60] via 172.20.180.162, 2w3d
+B        172.25.11.0/25 [20/150] via 172.20.180.162, 2w3d
+C        172.25.12.0/25 is directly connected, Port-channel12
+L        172.25.12.100/32 is directly connected, Port-channel12
+D        172.25.12.128/26 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                          [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+D EX     172.25.12.248/30 [170/51456] via 172.25.12.3, 7w0d, Port-channel12
+C        172.25.12.249/32 is directly connected, Loopback0
+B        172.25.62.17/32 [20/0] via 172.20.180.162, 7w0d
+B        172.25.62.115/32 [20/0] via 172.20.180.162, 1w2d
+B        172.25.128.0/24 [20/0] via 172.20.180.162, 6d17h
+B        172.25.136.0/26 [20/1762048] via 172.20.180.162, 6d17h
+B        172.25.137.1/32 [20/130816] via 172.20.180.162, 4d08h
+B        172.25.137.2/32 [20/0] via 172.20.180.162, 4d08h
+B        172.25.137.3/32 [20/0] via 172.20.180.162, 6d12h
+B        172.25.137.4/32 [20/0] via 172.20.180.162, 7w0d
+B        172.25.137.5/32 [20/0] via 172.20.180.162, 7w0d
+B        172.25.137.6/32 [20/0] via 172.20.180.162, 7w0d
+B        172.25.137.7/32 [20/0] via 172.20.180.162, 6d17h
+B        172.25.137.11/32 [20/0] via 172.20.180.162, 6d17h
+B        172.25.137.12/32 [20/0] via 172.20.180.162, 6d17h
+      172.29.0.0/24 is subnetted, 1 subnets
+B        172.29.1.0 [20/0] via 172.20.180.162, 7w0d
+      177.52.0.0/32 is subnetted, 1 subnets
+B        177.52.65.99 [20/21] via 172.20.180.162, 1w1d
+      187.9.0.0/32 is subnetted, 1 subnets
+B        187.9.214.86 [20/21] via 172.20.180.162, 1w1d
+B     192.168.0.0/16 [20/0] via 172.20.180.162, 7w0d
+B     192.168.2.0/24 [20/2] via 172.20.180.162, 1w1d
+B     192.168.3.0/24 [20/2] via 172.20.180.162, 1w1d
+D     192.168.11.0/24 [90/3072] via 172.25.12.3, 7w0d, Port-channel12
+                      [90/3072] via 172.25.12.2, 7w0d, Port-channel12
+B     192.168.13.0/24 [20/2] via 172.20.180.162, 1w1d
+      194.212.193.0/28 is subnetted, 2 subnets
+B        194.212.193.32 [20/1762048] via 172.20.180.162, 7w0d
+B        194.212.193.48 [20/1762048] via 172.20.180.162, 7w0d
+B     198.155.0.0/16 [20/1762048] via 172.20.180.162, 6d17h
+      200.248.93.0/32 is subnetted, 1 subnets
+B        200.248.93.130 [20/21] via 172.20.180.162, 1w1d
+sh vpc
+                    ^
+% Invalid input detected at '^' marker.
+
+sh ip bgp sum
+BGP router identifier 172.25.12.249, local AS number 65021
+BGP table version is 455512, main routing table version 455512
+465 network entries using 66960 bytes of memory
+962 path entries using 76960 bytes of memory
+233/100 BGP path/bestpath attribute entries using 37280 bytes of memory
+74 BGP AS-PATH entries using 2024 bytes of memory
+39 BGP community entries using 6274 bytes of memory
+1 BGP extended community entries using 24 bytes of memory
+0 BGP route-map cache entries using 0 bytes of memory
+0 BGP filter-list cache entries using 0 bytes of memory
+BGP using 189522 total bytes of memory
+72 received paths for inbound soft reconfiguration
+BGP activity 3742/3277 prefixes, 10223/9261 paths, scan interval 60 secs
+
+Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+172.20.128.117  4         3549       0       0        1    0    0 never    Idle (Admin)
+172.20.129.102  4         3549       0       0        1    0    0 never    Idle
+172.20.180.162  4        64514  508046  468026   455512    0    0 21w1d         425
+172.20.180.163  4        64514  509215  468105   455512    0    0 21w1d         425
+172.29.1.1      4        65072       0       0        1    0    0 never    Idle
+172.29.2.1      4        65001       0       0        1    0    0 never    Idle

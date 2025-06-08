@@ -1,0 +1,1491 @@
+sh run | i hostname
+hostname AM-BOT-W01-SW2-L3-Internet
+sh run
+Building configuration...
+
+Current configuration : 16214 bytes
+!
+! No configuration change since last restart
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec localtime
+service timestamps log datetime msec localtime
+service password-encryption
+!
+hostname AM-BOT-W01-SW2-L3-Internet
+!
+boot-start-marker
+boot-end-marker
+!
+no logging console
+enable secret 5 $1$cJZH$CCixorGoC5iehOSHkYaS..
+!
+username admin privilege 15 password 7 113D1E5C36333A541C78190469
+username BHCAdmin privilege 15 secret 5 $1$b8wL$.y7H6Lk9ZkxlY9S1mzvZ.0
+username lumen privilege 15 secret 5 $1$UmPC$mojri6S73twHaqq8l36AL0
+!
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ BHC-GRP
+ server 161.242.71.121
+ server 161.242.87.121
+ ip tacacs source-interface Vlan5
+!
+aaa authentication fail-message ^CYOUR ATTEMPT TO ACCESS THIS SYSTEM WAS REJECTED AND HAS BEEN LOGGED ^C
+aaa authentication login BHC group BHC-GRP local-case
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec BHC group BHC-GRP local if-authenticated 
+aaa authorization commands 0 default group tacacs+ local 
+aaa authorization commands 0 BHC group BHC-GRP local if-authenticated 
+aaa authorization commands 1 default group tacacs+ local 
+aaa authorization commands 1 BHC group BHC-GRP local if-authenticated 
+aaa authorization commands 7 BHC group BHC-GRP local if-authenticated 
+aaa authorization commands 15 BHC group BHC-GRP local if-authenticated 
+aaa accounting exec default start-stop group BHC-GRP
+aaa accounting commands 0 default start-stop group BHC-GRP
+aaa accounting commands 1 default start-stop group BHC-GRP
+aaa accounting commands 7 default start-stop group BHC-GRP
+aaa accounting commands 15 default start-stop group BHC-GRP
+!
+!
+!
+aaa session-id common
+clock timezone PST -8
+clock summer-time PDT recurring
+system mtu routing 1500
+ip routing
+ip dhcp excluded-address 10.241.56.1 10.241.56.50
+!
+ip dhcp pool vlan10
+   network 10.240.56.0 255.255.255.0
+   default-router 10.240.56.1 
+   domain-name valeant.com
+!
+ip dhcp pool vlan20
+   network 10.241.56.0 255.255.255.0
+   default-router 10.241.56.1 
+   dns-server 8.8.8.8 
+   option 43 hex f108.0af1.380a.0af1.390a
+!
+!
+no ip domain-lookup
+ip domain-name medicis.com
+ip name-server 161.242.92.34
+ip name-server 161.242.71.34
+vtp domain NULL
+vtp mode transparent
+!
+mls qos map cos-dscp 0 8 16 24 32 46 48 56
+mls qos
+!
+crypto pki trustpoint HTTPS_SS_CERT_KEYPAIR
+ enrollment selfsigned
+ serial-number
+ revocation-check none
+ rsakeypair HTTPS_SS_CERT_KEYPAIR
+!
+!
+crypto pki certificate chain HTTPS_SS_CERT_KEYPAIR
+ certificate self-signed 01
+  308202F0 30820259 A0030201 02020101 300D0609 2A864886 F70D0101 04050030 
+  79312F30 2D060355 04031326 414D2D42 4F542D57 30312D53 57322D4C 332D496E 
+  7465726E 65742E6D 65646963 69732E63 6F6D3146 300F0603 55040513 08373035 
+  30393338 30303306 092A8648 86F70D01 09021626 414D2D42 4F542D57 30312D53 
+  57322D4C 332D496E 7465726E 65742E6D 65646963 69732E63 6F6D301E 170D3138 
+  30383236 30313430 31345A17 0D323030 31303130 30303030 305A3079 312F302D 
+  06035504 03132641 4D2D424F 542D5730 312D5357 322D4C33 2D496E74 65726E65 
+  742E6D65 64696369 732E636F 6D314630 0F060355 04051308 37303530 39333830 
+  30330609 2A864886 F70D0109 02162641 4D2D424F 542D5730 312D5357 322D4C33 
+  2D496E74 65726E65 742E6D65 64696369 732E636F 6D30819F 300D0609 2A864886 
+  F70D0101 01050003 818D0030 81890281 8100A2C5 125E5166 9A540714 F8E65B5B 
+  DA4F846E 90E8B436 6FAC4B60 8F33659F A97F4F91 6D5EC99A 8C117A81 2EBF9392 
+  1EC0CF6D 19BB9F0A 43D1434E 6D0292E4 B6560A4B A63F79F5 11609A18 CCB34D7E 
+  910B8302 1F9DD506 5E9DE328 6F26F863 91BE18AE C9EBD04E 9381686D 60218EEE 
+  EE784CCB 01944668 7A0AFB83 81050A13 81E70203 010001A3 81873081 84300F06 
+  03551D13 0101FF04 05300301 01FF3031 0603551D 11042A30 28822641 4D2D424F 
+  542D5730 312D5357 322D4C33 2D496E74 65726E65 742E6D65 64696369 732E636F 
+  6D301F06 03551D23 04183016 80142A6E 66111403 00845449 BE41EDD6 8723751B 
+  638A301D 0603551D 0E041604 142A6E66 11140300 845449BE 41EDD687 23751B63 
+  8A300D06 092A8648 86F70D01 01040500 03818100 3BD4C790 4CB94084 C8733936 
+  B985B499 B8517F62 EEC45143 33FB4AB3 FAD410A2 44F05E0C 12823332 16AE34EC 
+  3959A4FA A45264E9 72E9CF44 BC3DCBC8 2A3769B1 86E3BC6D 6A24E55A C3F8986C 
+  F27657F0 A5E0BCD6 9D444AF4 C5EA6C09 E985A028 7C1571E0 C49353C5 31E74189 
+  673C11FB BC71FF9B DBEF59BF 20DC9032 39236379
+  quit
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+!
+!
+!
+errdisable recovery cause udld
+errdisable recovery cause bpduguard
+errdisable recovery cause security-violation
+errdisable recovery cause channel-misconfig (STP)
+errdisable recovery cause pagp-flap
+errdisable recovery cause dtp-flap
+errdisable recovery cause link-flap
+errdisable recovery cause sfp-config-mismatch
+errdisable recovery cause gbic-invalid
+errdisable recovery cause l2ptguard
+errdisable recovery cause psecure-violation
+errdisable recovery cause port-mode-failure
+errdisable recovery cause dhcp-rate-limit
+errdisable recovery cause pppoe-ia-rate-limit
+errdisable recovery cause mac-limit
+errdisable recovery cause vmps
+errdisable recovery cause storm-control
+errdisable recovery cause inline-power
+errdisable recovery cause arp-inspection
+errdisable recovery cause loopback
+errdisable recovery cause small-frame
+errdisable recovery interval 60
+!
+vlan internal allocation policy ascending
+!
+vlan 5 
+!
+vlan 989
+ name SDWAN-LAN1.VLAN.989
+!
+vlan 990
+ name SDWAN-LAN1.VLAN.990
+!
+vlan 991
+ name MPLS.VLAN.991
+!
+vlan 998
+ name DIA2.VLAN.998
+!
+vlan 999
+ name DIA1.VLAN.999
+!
+ip ssh version 2
+!
+class-map match-all VVLAN-CALL-SIGNALING
+ match access-group name VVLAN-CALL-SIGNALING
+class-map match-all VVLAN-VOICE
+ match access-group name VVLAN-VOICE
+class-map match-all VVLAN-ANY
+ match access-group name VVLAN-ANY
+!
+!
+policy-map INPUT-VOIP-MARK
+ class VVLAN-VOICE
+  set dscp ef
+ class VVLAN-CALL-SIGNALING
+  set dscp cs3
+ class VVLAN-ANY
+  set dscp default
+ class class-default
+  set dscp default
+!
+!
+!
+interface Port-channel20
+ description AM-BOT-A01-5K2-Eth101/1/47
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 999
+ switchport mode trunk
+ load-interval 30
+ spanning-tree portfast
+!
+interface FastEthernet0
+ description Management
+ ip address 172.25.12.28 255.255.255.128
+ no ip route-cache cef
+ no ip route-cache
+ no ip mroute-cache
+!
+interface GigabitEthernet0/1
+ description SDWAN1_LAN1_VNI0/3_port4
+ switchport access vlan 989
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/2
+!
+interface GigabitEthernet0/3
+!
+interface GigabitEthernet0/4
+ description SDWAN1_Internet_VNI0/5_port6
+ switchport access vlan 999
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/5
+ description SDWAN1_DIA2_VNI0/6_port7
+ switchport access vlan 998
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/6
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/7
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/8
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/9
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/10
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/11
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/12
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/13
+ description SDWAN2_LAN1_VNI0/3_port4
+ switchport access vlan 989
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/14
+!
+interface GigabitEthernet0/15
+ description SDWAN2_DIA1_VNI0/5_port6
+ switchport access vlan 999
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/16
+ description SDWAN2_DIA2_VNI0/6_port7
+ switchport access vlan 998
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/17
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/18
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/19
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/20
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/21
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/22
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/23
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/24
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/25
+!
+interface GigabitEthernet0/26
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/27
+ description DIA2-LUMEN-DIA:CID-446607669-BW:1000MB
+ switchport access vlan 998
+ switchport mode access
+ load-interval 30
+ no cdp enable
+ spanning-tree portfast
+!
+interface GigabitEthernet0/28
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/29
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/30
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/31
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/32
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/33
+ description AM-BOT-A01-R01-Gi0/0
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 989,990
+ switchport mode trunk
+ load-interval 30
+ spanning-tree portfast
+!
+interface GigabitEthernet0/34
+ description AM-BOT-A01-5K2-Eth101/1/47
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 999
+ switchport mode trunk
+ load-interval 30
+ spanning-tree portfast
+ channel-group 20 mode active
+!
+interface GigabitEthernet0/35
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/36
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/37
+!
+interface GigabitEthernet0/38
+!
+interface GigabitEthernet0/39
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/40
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/41
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/42
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/43
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet0/44
+!
+interface GigabitEthernet0/45
+!
+interface GigabitEthernet0/46
+ description DIA1-LUMEN-DIA:CID-443879057-BW:1000MB
+ switchport access vlan 999
+ switchport mode access
+ load-interval 30
+ duplex full
+ no cdp enable
+ spanning-tree portfast
+!
+interface GigabitEthernet0/47
+!
+interface GigabitEthernet0/48
+ description AM-BOT-A01-5K2-Eth102/1/47
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 999
+ switchport mode trunk
+ load-interval 30
+ spanning-tree portfast
+ channel-group 20 mode active
+!
+interface GigabitEthernet0/49
+ shutdown
+!
+interface GigabitEthernet0/50
+ shutdown
+!
+interface GigabitEthernet0/51
+ shutdown
+!
+interface GigabitEthernet0/52
+ shutdown
+!
+interface TenGigabitEthernet0/1
+ shutdown
+!
+interface TenGigabitEthernet0/2
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan5
+ no ip address
+!
+interface Vlan209
+ no ip address
+!
+!
+router eigrp 251
+ network 172.25.12.0 0.0.0.255
+ auto-summary
+ eigrp stub connected summary
+!
+ip default-gateway 172.25.12.110
+ip classless
+ip http server
+ip http secure-server
+!
+ip access-list standard LUMEN_10
+ permit 68.177.240.0 0.0.0.255 log
+ip access-list standard VTY_ACCESS
+ remark TO RESTRICT VTY ACCESS
+ permit 10.0.0.0 0.255.255.255 log
+ permit 161.242.0.0 0.0.255.255 log
+ permit 172.16.0.0 0.15.255.255 log
+ permit 68.177.240.0 0.0.0.15 log
+ permit 68.177.241.0 0.0.0.15 log
+!
+ip access-list extended VVLAN-ANY
+ permit ip 172.23.208.0 0.0.0.255 any
+ip access-list extended VVLAN-CALL-SIGNALING
+ permit tcp 172.23.208.0 0.0.0.255 any range 2000 2002
+ip access-list extended VVLAN-VOICE
+ permit udp 172.23.208.0 0.0.0.255 any range 16384 32767
+!
+ip sla 10
+ icmp-echo 8.8.4.4
+ frequency 5
+ip sla schedule 10 life forever start-time now
+ip sla reaction-configuration 10 react timeout threshold-type immediate action-type trapOnly
+logging facility local4
+logging source-interface Vlan209
+logging 172.23.211.35
+access-list 22 permit 161.242.218.59
+access-list 22 permit 10.252.40.60
+access-list 22 remark --LiveAction-SNMP-ACCESS--
+access-list 41 permit 10.0.16.24
+access-list 41 permit 10.228.236.14
+access-list 41 permit 161.242.54.124
+access-list 41 permit 10.252.64.170
+access-list 41 permit 10.0.16.60
+access-list 41 permit 161.242.88.62
+access-list 41 permit 172.23.211.82
+access-list 41 permit 161.242.68.45
+access-list 41 permit 161.242.74.38
+access-list 41 permit 161.242.56.46
+access-list 41 permit 161.242.57.38
+access-list 41 permit 161.242.56.37
+access-list 41 permit 161.242.56.36
+access-list 41 permit 161.242.95.92
+access-list 41 permit 161.242.61.57
+access-list 41 permit 10.36.12.122
+access-list 41 permit 10.36.12.120
+access-list 41 permit 10.243.167.5
+access-list 41 permit 161.242.56.48
+access-list 41 permit 161.242.61.53
+access-list 41 permit 161.242.32.47
+access-list 41 permit 161.242.100.80
+access-list 41 permit 10.243.154.21
+access-list 41 permit 10.252.20.107
+access-list 41 permit 10.240.101.21
+access-list 41 permit 161.242.68.153
+access-list 41 permit 161.242.68.152
+access-list 41 permit 10.243.107.14
+access-list 41 permit 161.242.141.111
+access-list 41 permit 161.242.92.188
+access-list 41 permit 161.242.92.187
+access-list 41 permit 10.243.165.157
+access-list 41 permit 161.242.53.160
+access-list 41 permit 10.243.43.21
+access-list 41 permit 161.242.53.161
+access-list 41 permit 161.242.68.221
+access-list 41 permit 161.242.68.220
+access-list 41 permit 161.242.68.196
+access-list 41 permit 10.252.66.97
+access-list 41 permit 10.243.44.14
+access-list 41 permit 10.252.65.83
+access-list 41 permit 161.242.98.204
+access-list 80 remark --CiscoCollector-SNMP-ACCESS--
+access-list 80 permit 161.242.68.66
+access-list 122 permit tcp 10.240.0.0 0.0.255.255 any eq 22
+access-list 122 permit tcp 10.252.0.0 0.0.255.255 any eq 22
+access-list 122 permit tcp 161.242.0.0 0.0.255.255 any eq 22
+access-list 122 permit tcp 10.254.0.0 0.0.255.255 any eq 22
+access-list 122 permit tcp 10.248.0.0 0.1.255.255 any eq 22
+access-list 122 permit tcp 10.228.0.0 0.0.255.255 any eq 22
+snmp-server community tasTesGreat RO 41
+snmp-server community les$Filling RW 22
+snmp-server community bZyrH94$@! RO LUMEN_10
+snmp-server community C0ll3ctMe$ RO 80
+snmp-server location Bothell
+snmp-server enable traps license
+tacacs-server host 161.242.71.121 key 7 06242702017A081A243421460701336A
+tacacs-server host 161.242.87.121 key 7 072D096F033D1806363138410F2F3265
+tacacs-server directed-request
+!
+!
+line con 0
+ session-timeout 5 
+ exec-timeout 15 0
+ password 7 0340681E165D731A
+ logging synchronous
+ login authentication BHC
+ stopbits 1
+ speed 115200
+line vty 0 4
+ session-timeout 30 
+ access-class VTY_ACCESS in
+ exec-timeout 30 0
+ password 7 030F5E0E165F3458
+ authorization commands 0 BHC
+ authorization commands 1 BHC
+ authorization commands 7 BHC
+ authorization commands 15 BHC
+ authorization exec BHC
+ logging synchronous
+ login authentication BHC
+ transport input ssh
+line vty 5 15
+ session-timeout 30 
+ access-class VTY_ACCESS in
+ exec-timeout 30 0
+ password 7 030F5E0E165F3458
+ authorization commands 0 BHC
+ authorization commands 1 BHC
+ authorization commands 7 BHC
+ authorization commands 15 BHC
+ authorization exec BHC
+ logging synchronous
+ login authentication BHC
+ transport input ssh
+!
+ntp clock-period 36028703
+ntp server 10.0.1.8
+ntp server 161.242.71.8 prefer
+end
+
+sh int status
+
+Port      Name               Status       Vlan       Duplex  Speed Type
+Gi0/1     SDWAN1_LAN1_VNI0/3 connected    989        a-full a-1000 10/100/1000BaseTX
+Gi0/2                        notconnect   1            auto   auto 10/100/1000BaseTX
+Gi0/3                        notconnect   1            auto   auto 10/100/1000BaseTX
+Gi0/4     SDWAN1_Internet_VN connected    999        a-full a-1000 10/100/1000BaseTX
+Gi0/5     SDWAN1_DIA2_VNI0/6 connected    998        a-full a-1000 10/100/1000BaseTX
+Gi0/6                        notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/7                        notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/8                        notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/9                        notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/10                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/11                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/12                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/13    SDWAN2_LAN1_VNI0/3 connected    989        a-full a-1000 10/100/1000BaseTX
+Gi0/14                       notconnect   1            auto   auto 10/100/1000BaseTX
+Gi0/15    SDWAN2_DIA1_VNI0/5 connected    999        a-full a-1000 10/100/1000BaseTX
+Gi0/16    SDWAN2_DIA2_VNI0/6 connected    998        a-full a-1000 10/100/1000BaseTX
+Gi0/17                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/18                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/19                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/20                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/21                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/22                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/23                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/24                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/25                       notconnect   1            auto   auto 10/100/1000BaseTX
+Gi0/26                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/27    DIA2-LUMEN-DIA:CID connected    998        a-full a-1000 10/100/1000BaseTX
+Gi0/28                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/29                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/30                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/31                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/32                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/33    AM-BOT-A01-R01-Gi0 connected    trunk      a-full a-1000 10/100/1000BaseTX
+Gi0/34    AM-BOT-A01-5K2-Eth connected    trunk      a-full a-1000 10/100/1000BaseTX
+Gi0/35                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/36                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/37                       notconnect   1            auto   auto 10/100/1000BaseTX
+Gi0/38                       notconnect   1            auto   auto 10/100/1000BaseTX
+Gi0/39                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/40                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/41                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/42                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/43                       notconnect   5            auto   auto 10/100/1000BaseTX
+Gi0/44                       notconnect   1            auto   auto 10/100/1000BaseTX
+Gi0/45                       notconnect   1            auto   auto 10/100/1000BaseTX
+Gi0/46    DIA1-LUMEN-DIA:CID connected    999          full a-1000 10/100/1000BaseTX
+Gi0/47                       notconnect   1            auto   auto 10/100/1000BaseTX
+Gi0/48    AM-BOT-A01-5K2-Eth connected    trunk      a-full a-1000 10/100/1000BaseTX
+Gi0/49                       disabled     1            auto   auto Not Present
+Gi0/50                       disabled     1            auto   auto Not Present
+Gi0/51                       disabled     1            auto   auto Not Present
+Gi0/52                       disabled     1            auto   auto Not Present
+Po20      AM-BOT-A01-5K2-Eth connected    trunk      a-full a-1000 
+Fa0       Management         connected    routed     a-full  a-100 10/100BaseTX
+sh ip int bri
+Interface              IP-Address      OK? Method Status                Protocol
+Vlan1                  unassigned      YES NVRAM  administratively down down    
+Vlan5                  unassigned      YES NVRAM  up                    down    
+Vlan209                unassigned      YES NVRAM  down                  down    
+FastEthernet0          172.25.12.28    YES NVRAM  up                    up      
+GigabitEthernet0/1     unassigned      YES unset  up                    up      
+GigabitEthernet0/2     unassigned      YES unset  down                  down    
+GigabitEthernet0/3     unassigned      YES unset  down                  down    
+GigabitEthernet0/4     unassigned      YES unset  up                    up      
+GigabitEthernet0/5     unassigned      YES unset  up                    up      
+GigabitEthernet0/6     unassigned      YES unset  down                  down    
+GigabitEthernet0/7     unassigned      YES unset  down                  down    
+GigabitEthernet0/8     unassigned      YES unset  down                  down    
+GigabitEthernet0/9     unassigned      YES unset  down                  down    
+GigabitEthernet0/10    unassigned      YES unset  down                  down    
+GigabitEthernet0/11    unassigned      YES unset  down                  down    
+GigabitEthernet0/12    unassigned      YES unset  down                  down    
+GigabitEthernet0/13    unassigned      YES unset  up                    up      
+GigabitEthernet0/14    unassigned      YES unset  down                  down    
+GigabitEthernet0/15    unassigned      YES unset  up                    up      
+GigabitEthernet0/16    unassigned      YES unset  up                    up      
+GigabitEthernet0/17    unassigned      YES unset  down                  down    
+GigabitEthernet0/18    unassigned      YES unset  down                  down    
+GigabitEthernet0/19    unassigned      YES unset  down                  down    
+GigabitEthernet0/20    unassigned      YES unset  down                  down    
+GigabitEthernet0/21    unassigned      YES unset  down                  down    
+GigabitEthernet0/22    unassigned      YES unset  down                  down    
+GigabitEthernet0/23    unassigned      YES unset  down                  down    
+GigabitEthernet0/24    unassigned      YES unset  down                  down    
+GigabitEthernet0/25    unassigned      YES unset  down                  down    
+GigabitEthernet0/26    unassigned      YES unset  down                  down    
+GigabitEthernet0/27    unassigned      YES unset  up                    up      
+GigabitEthernet0/28    unassigned      YES unset  down                  down    
+GigabitEthernet0/29    unassigned      YES unset  down                  down    
+GigabitEthernet0/30    unassigned      YES unset  down                  down    
+GigabitEthernet0/31    unassigned      YES unset  down                  down    
+GigabitEthernet0/32    unassigned      YES unset  down                  down    
+GigabitEthernet0/33    unassigned      YES unset  up                    up      
+GigabitEthernet0/34    unassigned      YES unset  up                    up      
+GigabitEthernet0/35    unassigned      YES unset  down                  down    
+GigabitEthernet0/36    unassigned      YES unset  down                  down    
+GigabitEthernet0/37    unassigned      YES unset  down                  down    
+GigabitEthernet0/38    unassigned      YES unset  down                  down    
+GigabitEthernet0/39    unassigned      YES unset  down                  down    
+GigabitEthernet0/40    unassigned      YES unset  down                  down    
+GigabitEthernet0/41    unassigned      YES unset  down                  down    
+GigabitEthernet0/42    unassigned      YES unset  down                  down    
+GigabitEthernet0/43    unassigned      YES unset  down                  down    
+GigabitEthernet0/44    unassigned      YES unset  down                  down    
+GigabitEthernet0/45    unassigned      YES unset  down                  down    
+GigabitEthernet0/46    unassigned      YES unset  up                    up      
+GigabitEthernet0/47    unassigned      YES unset  down                  down    
+GigabitEthernet0/48    unassigned      YES unset  up                    up      
+GigabitEthernet0/49    unassigned      YES unset  administratively down down    
+GigabitEthernet0/50    unassigned      YES unset  administratively down down    
+GigabitEthernet0/51    unassigned      YES unset  administratively down down    
+GigabitEthernet0/52    unassigned      YES unset  administratively down down    
+TenGigabitEthernet0/1  unassigned      YES unset  administratively down down    
+TenGigabitEthernet0/2  unassigned      YES unset  administratively down down    
+Port-channel20         unassigned      YES unset  up                    up      
+sh vlan
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Gi0/2, Gi0/3, Gi0/14, Gi0/25, Gi0/37, Gi0/38, Gi0/44, Gi0/45, Gi0/47, Gi0/49, Gi0/50, Gi0/51, Gi0/52
+5    VLAN0005                         active    Gi0/6, Gi0/7, Gi0/8, Gi0/9, Gi0/10, Gi0/11, Gi0/12, Gi0/17, Gi0/18, Gi0/19, Gi0/20, Gi0/21, Gi0/22, Gi0/23, Gi0/24, Gi0/26, Gi0/28, Gi0/29, Gi0/30, Gi0/31, Gi0/32, Gi0/35, Gi0/36, Gi0/39, Gi0/40, Gi0/41, Gi0/42, Gi0/43
+989  SDWAN-LAN1.VLAN.989              active    Gi0/1, Gi0/13
+990  SDWAN-LAN1.VLAN.990              active    
+991  MPLS.VLAN.991                    active    
+998  DIA2.VLAN.998                    active    Gi0/5, Gi0/16, Gi0/27
+999  DIA1.VLAN.999                    active    Gi0/4, Gi0/15, Gi0/46
+1002 fddi-default                     act/unsup 
+1003 token-ring-default               act/unsup 
+1004 fddinet-default                  act/unsup 
+1005 trnet-default                    act/unsup 
+
+VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+1    enet  100001     1500  -      -      -        -    -        0      0   
+5    enet  100005     1500  -      -      -        -    -        0      0   
+989  enet  100989     1500  -      -      -        -    -        0      0   
+990  enet  100990     1500  -      -      -        -    -        0      0   
+991  enet  100991     1500  -      -      -        -    -        0      0   
+998  enet  100998     1500  -      -      -        -    -        0      0   
+999  enet  100999     1500  -      -      -        -    -        0      0   
+1002 fddi  101002     1500  -      -      -        -    -        0      0   
+1003 tr    101003     1500  -      -      -        -    -        0      0   
+1004 fdnet 101004     1500  -      -      -        ieee -        0      0   
+1005 trnet 101005     1500  -      -      -        ibm  -        0      0   
+
+Remote SPAN VLANs
+------------------------------------------------------------------------------
+
+
+Primary Secondary Type              Ports
+------- --------- ----------------- ------------------------------------------
+
+sh ver
+Cisco IOS Software, C3560E Software (C3560E-IPBASEK9-M), Version 12.2(55)SE11, RELEASE SOFTWARE (fc3)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2016 by Cisco Systems, Inc.
+Compiled Wed 17-Aug-16 12:43 by prod_rel_team
+Image text-base: 0x00003000, data-base: 0x02800000
+
+ROM: Bootstrap program is C3560E boot loader
+BOOTLDR: C3560E Boot Loader (C3560E-HBOOT-M) Version 12.2(44r)SE5, RELEASE SOFTWARE (fc3)
+
+AM-BOT-W01-SW2-L3-Internet uptime is 21 weeks, 1 day, 7 hours, 29 minutes
+System returned to ROM by power-on
+System restarted at 13:21:47 PST Thu Jan 9 2025
+System image file is "flash:/c3560e-ipbasek9-mz.122-55.SE11.bin"
+
+
+This product contains cryptographic features and is subject to United
+States and local country laws governing import, export, transfer and
+use. Delivery of Cisco cryptographic products does not imply
+third-party authority to import, export, distribute or use encryption.
+Importers, exporters, distributors and users are responsible for
+compliance with U.S. and local country laws. By using this product you
+agree to comply with applicable laws and regulations. If you are unable
+to comply with U.S. and local laws, return this product immediately.
+
+A summary of U.S. laws governing Cisco cryptographic products may be found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to
+export@cisco.com.
+
+License Level: ipbase
+License Type: Permanent
+Next reload license Level: ipbase
+
+cisco WS-C3560E-48PD (PowerPC405) processor (revision E0) with 131072K bytes of memory.
+Processor board ID FDO1219V230
+Last reset from power-on
+3 Virtual Ethernet interfaces
+1 FastEthernet interface
+52 Gigabit Ethernet interfaces
+2 Ten Gigabit Ethernet interfaces
+The password-recovery mechanism is enabled.
+
+512K bytes of flash-simulated non-volatile configuration memory.
+Base ethernet MAC Address       : 00:1D:70:50:93:80
+Motherboard assembly number     : 73-10320-12
+Motherboard serial number       : FDO12190HJJ
+Model revision number           : E0
+Motherboard revision number     : B0
+Model number                    : WS-C3560E-48PD-SF
+Daughterboard assembly number   : 800-28590-01
+Daughterboard serial number     : FDO121913B0
+System serial number            : FDO1219V230
+Top Assembly Part Number        : 800-28447-04
+Top Assembly Revision Number    : A0
+Version ID                      : V02
+CLEI Code Number                : COM9Y10ARA
+Hardware Board Revision Number  : 0x01
+
+
+Switch Ports Model              SW Version            SW Image                 
+------ ----- -----              ----------            ----------               
+*    1 54    WS-C3560E-48PD     12.2(55)SE11          C3560E-IPBASEK9-M        
+
+
+Configuration register is 0xF
+
+sh inventory
+NAME: "1", DESCR: "WS-C3560E-48PD"
+PID: WS-C3560E-48PD-SF , VID: V02  , SN: FDO1219V230
+
+NAME: "Power Supply 0", DESCR: "FRU Power Supply"
+PID: C3K-PWR-1150WAC   , VID: V01  , SN: DTH1217RA92
+
+NAME: "Slot 1 - TwinGig Converter Module", DESCR: "TwinGig Converter Module"
+PID: A^D^K8^X^Dk@^D^D^K8^A-A  , VID: A0   , SN: FDO122106VV     
+
+NAME: "Slot 2 - TwinGig Converter Module", DESCR: "TwinGig Converter Module"
+PID: A^D^K8^X^Dk^Dp^D^K8^A-A  , VID: A0   , SN: FDO1221068D     
+
+
+sh mod
+                                ^
+% Invalid input detected at '^' marker.
+
+sh mac address-table
+          Mac Address Table
+-------------------------------------------
+
+Vlan    Mac Address       Type        Ports
+----    -----------       --------    -----
+ All    0100.0ccc.cccc    STATIC      CPU
+ All    0100.0ccc.cccd    STATIC      CPU
+ All    0180.c200.0000    STATIC      CPU
+ All    0180.c200.0001    STATIC      CPU
+ All    0180.c200.0002    STATIC      CPU
+ All    0180.c200.0003    STATIC      CPU
+ All    0180.c200.0004    STATIC      CPU
+ All    0180.c200.0005    STATIC      CPU
+ All    0180.c200.0006    STATIC      CPU
+ All    0180.c200.0007    STATIC      CPU
+ All    0180.c200.0008    STATIC      CPU
+ All    0180.c200.0009    STATIC      CPU
+ All    0180.c200.000a    STATIC      CPU
+ All    0180.c200.000b    STATIC      CPU
+ All    0180.c200.000c    STATIC      CPU
+ All    0180.c200.000d    STATIC      CPU
+ All    0180.c200.000e    STATIC      CPU
+ All    0180.c200.000f    STATIC      CPU
+ All    0180.c200.0010    STATIC      CPU
+ All    ffff.ffff.ffff    STATIC      CPU
+ 999    0090.0bb3.d883    DYNAMIC     Gi0/15
+ 999    0090.0bb3.de33    DYNAMIC     Gi0/4
+ 999    10e8.78ab.56a7    DYNAMIC     Gi0/46
+ 999    8c94.6123.f824    DYNAMIC     Po20
+ 998    0090.0bb3.d884    DYNAMIC     Gi0/16
+ 998    0090.0bb3.de34    DYNAMIC     Gi0/5
+ 998    0ca4.02a0.3560    DYNAMIC     Gi0/27
+ 989    0090.0bb3.d880    DYNAMIC     Gi0/13
+ 989    0090.0bb3.de30    DYNAMIC     Gi0/1
+ 989    d46d.50a0.2e80    DYNAMIC     Gi0/33
+Total Mac Addresses for this criterion: 30
+sh arp
+Protocol  Address          Age (min)  Hardware Addr   Type   Interface
+Internet  172.25.12.28            -   001d.7050.93b7  ARPA   FastEthernet0
+Internet  172.25.12.21          113   64f6.9d2d.1fbf  ARPA   FastEthernet0
+Internet  172.25.12.20          139   64f6.9d2d.203f  ARPA   FastEthernet0
+Internet  172.25.12.23          128   64f6.9d1e.f4bf  ARPA   FastEthernet0
+Internet  172.25.12.22          137   64f6.9d1e.f3bf  ARPA   FastEthernet0
+Internet  172.25.12.3             0   547f.ee9a.d17c  ARPA   FastEthernet0
+Internet  172.25.12.2             0   547f.ee9a.d13c  ARPA   FastEthernet0
+Internet  172.25.12.4           139   e089.9d14.38c7  ARPA   FastEthernet0
+Internet  172.25.12.100         117   d46d.50a0.2e81  ARPA   FastEthernet0
+sh cdp neighbors
+Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
+                  S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone, 
+                  D - Remote, C - CVTA, M - Two-port Mac Relay 
+
+Device ID        Local Intrfce     Holdtme    Capability  Platform  Port ID
+AM-BOT-A01-5K2.valeant.corp.vrx(SSI160904SQ)
+                 Gig 0/34          159             S I C  N5K-C5548 Eth 101/1/47
+AM-BOT-A01-5K1.valeant.corp.vrx(SSI160904XC)
+                 Fas 0             166             S I C  N5K-C5548 Eth 102/1/37
+AM-BOT-A01-5K1.valeant.corp.vrx(SSI160904XC)
+                 Gig 0/48          174             S I C  N5K-C5548 Eth 102/1/47
+AM-BOT-A01-R01.valeant.com
+                 Gig 0/33          173            R B S I CISCO3945 Gig 0/0
+sh ip protocols
+*** IP Routing is NSF aware ***
+
+Routing Protocol is "eigrp 251"
+  Outgoing update filter list for all interfaces is not set
+  Incoming update filter list for all interfaces is not set
+  Default networks flagged in outgoing updates
+  Default networks accepted from incoming updates
+  Redistributing: eigrp 251
+  EIGRP-IPv4 Protocol for AS(251)
+    Metric weight K1=1, K2=0, K3=1, K4=0, K5=0
+    NSF-aware route hold timer is 240
+    Router-ID: 172.25.12.28
+    Stub, connected, summary
+    Topology : 0 (base) 
+      Active Timer: 3 min
+      Distance: internal 90 external 170
+      Maximum path: 4
+      Maximum hopcount 100
+      Maximum metric variance 1
+
+  Automatic Summarization: enabled
+  Maximum path: 4
+  Routing for Networks:
+    172.25.12.0/24
+  Routing Information Sources:
+    Gateway         Distance      Last Update
+    172.25.12.3           90      07:55:53
+    172.25.12.2           90      07:55:53
+    172.25.12.4           90      07:56:48
+    172.25.12.100         90      07:55:53
+  Distance: internal 90 external 170
+
+sh ip route
+Codes: C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route
+
+Gateway of last resort is 172.25.12.3 to network 0.0.0.0
+
+     68.0.0.0/28 is subnetted, 2 subnets
+D EX    68.177.241.0 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    68.177.240.0 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+     187.9.0.0/32 is subnetted, 1 subnets
+D EX    187.9.214.86 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX 192.168.13.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+     100.0.0.0/27 is subnetted, 2 subnets
+D EX    100.64.245.32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    100.72.245.32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+     194.212.193.0/28 is subnetted, 2 subnets
+D EX    194.212.193.48 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    194.212.193.32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+     157.206.0.0/16 is variably subnetted, 16 subnets, 3 masks
+D EX    157.206.48.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.202.0/23 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.201.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.200.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.206.0/23 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.148.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.155.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.152.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.160.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.167.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.166.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.165.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.164.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.169.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.175.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    157.206.174.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+     4.0.0.0/32 is subnetted, 1 subnets
+D EX    4.2.2.1 [170/28672] via 172.25.12.3, 2w5d, FastEthernet0
+                [170/28672] via 172.25.12.2, 2w5d, FastEthernet0
+D EX 140.176.0.0/16 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+     172.16.0.0/16 is variably subnetted, 15 subnets, 4 masks
+D EX    172.16.255.5/32 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    172.16.255.4/32 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    172.16.60.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    172.16.14.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    172.16.15.0/24 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    172.16.8.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    172.16.9.0/24 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    172.16.10.0/24 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    172.16.2.8/30 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    172.16.11.0/24 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    172.16.5.0/25 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    172.16.4.1/32 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    172.16.6.0/25 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    172.16.2.4/30 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    172.16.7.0/25 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+     172.19.0.0/24 is subnetted, 1 subnets
+D EX    172.19.9.0 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+     172.18.0.0/16 is variably subnetted, 7 subnets, 3 masks
+D EX    172.18.20.160/28 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.18.19.160/27 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.18.19.192/27 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.18.18.56/29 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    172.18.19.0/27 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.18.20.88/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.18.18.80/28 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+     172.20.0.0/16 is variably subnetted, 32 subnets, 2 masks
+D EX    172.20.182.8/29 [170/54016] via 172.25.12.100, 5w3d, FastEthernet0
+D EX    172.20.146.32/30 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.180.0/29 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    172.20.181.0/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.180.24/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.181.16/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.180.40/29 [170/54016] via 172.25.12.100, 6d12h, FastEthernet0
+D EX    172.20.181.32/29 [170/54016] via 172.25.12.100, 5w1d, FastEthernet0
+D EX    172.20.180.48/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.181.48/29 [170/54016] via 172.25.12.100, 3w3d, FastEthernet0
+D EX    172.20.180.72/29 [170/54016] via 172.25.12.100, 2w4d, FastEthernet0
+D EX    172.20.181.64/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.180.88/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.181.80/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.180.104/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.181.104/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.180.120/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.181.120/29 
+           [170/54016] via 172.25.12.100, 08:40:15, FastEthernet0
+D EX    172.20.180.136/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.181.136/29 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    172.20.181.152/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.180.144/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.181.168/29 [170/54016] via 172.25.12.100, 2w2d, FastEthernet0
+D EX    172.20.181.184/29 [170/54016] via 172.25.12.100, 1w2d, FastEthernet0
+D EX    172.20.181.200/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.180.192/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.181.216/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.180.208/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.20.173.200/29 [170/54016] via 172.25.12.100, 5w6d, FastEthernet0
+D EX    172.20.181.232/29 [170/54016] via 172.25.12.100, 3w3d, FastEthernet0
+D EX    172.20.181.248/29 [170/54016] via 172.25.12.100, 4d03h, FastEthernet0
+D EX    172.20.180.240/29 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+     172.23.0.0/24 is subnetted, 4 subnets
+D       172.23.211.0 [90/28416] via 172.25.12.4, 7w0d, FastEthernet0
+                     [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                     [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       172.23.210.0 [90/28416] via 172.25.12.4, 7w0d, FastEthernet0
+                     [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                     [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       172.23.209.0 [90/28416] via 172.25.12.4, 7w0d, FastEthernet0
+                     [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                     [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       172.23.208.0 [90/28416] via 172.25.12.4, 7w0d, FastEthernet0
+                     [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                     [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+     172.22.0.0/32 is subnetted, 1 subnets
+D EX    172.22.16.11 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+     172.25.0.0/16 is variably subnetted, 23 subnets, 6 masks
+D EX    172.25.137.12/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.25.128.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.25.137.11/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.25.137.4/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.25.137.5/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D       172.25.12.128/26 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                         [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D EX    172.25.137.6/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.25.137.7/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.25.137.1/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.25.136.0/26 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.25.137.2/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.25.137.3/32 [170/54016] via 172.25.12.100, 6d12h, FastEthernet0
+D       172.25.12.249/32 [90/156160] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.25.12.248/30 [170/53760] via 172.25.12.3, 7w0d, FastEthernet0
+D EX    172.25.10.240/29 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    172.25.62.17/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+C       172.25.12.0/25 is directly connected, FastEthernet0
+D EX    172.25.10.2/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    172.25.8.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.25.11.0/25 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    172.25.10.1/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    172.25.10.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    172.25.62.115/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+     172.24.0.0/16 is variably subnetted, 8 subnets, 2 masks
+D EX    172.24.219.120/30 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.24.219.117/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.24.219.60/30 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.24.219.24/30 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.24.219.205/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.24.219.197/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.24.219.220/30 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    172.24.219.180/30 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+     172.29.0.0/24 is subnetted, 1 subnets
+D EX    172.29.1.0 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D    192.168.11.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                     [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D EX 158.117.0.0/16 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+     8.0.0.0/32 is subnetted, 2 subnets
+D EX    8.8.8.8 [170/28672] via 172.25.12.3, 2w5d, FastEthernet0
+                [170/28672] via 172.25.12.2, 2w5d, FastEthernet0
+D EX    8.8.4.4 [170/53760] via 172.25.12.3, 7w0d, FastEthernet0
+                [170/53760] via 172.25.12.2, 7w0d, FastEthernet0
+     177.52.0.0/32 is subnetted, 1 subnets
+D EX    177.52.65.99 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+     10.0.0.0/8 is variably subnetted, 294 subnets, 17 masks
+D EX    10.10.0.0/16 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.36.15.32/27 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.2.9.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.4.12.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.0.8.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.185.176.0/20 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.10.10.14/32 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.10.10.15/32 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.253.240.0/21 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.10.10.13/32 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.242.240.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.3.1.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.0.2.0/30 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.243.240.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.0.3.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.252.64.188/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.240.240.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.144.144.0/20 [170/54016] via 172.25.12.100, 6d14h, FastEthernet0
+D EX    10.0.0.0/8 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.241.240.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.1.0.0/20 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.0.1.0/30 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.0.1.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.242.244.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.224.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.253.248.0/21 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.248.227.0/24 [170/54016] via 172.25.12.100, 08:40:15, FastEthernet0
+D EX    10.248.224.0/23 [170/54016] via 172.25.12.100, 08:40:15, FastEthernet0
+D EX    10.228.252.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.185.160.0/20 [170/54016] via 172.25.12.100, 3w1d, FastEthernet0
+D EX    10.228.250.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.174.176.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.251.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.174.177.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.174.178.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.253.224.0/21 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.174.179.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.248.234.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.18.0.0/16 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.248.235.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.250.234.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.244.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.144.128.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.144.128.0/17 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.16.0.0/16 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    10.228.240.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.253.232.0/21 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.36.14.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.33.11.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.36.15.0/27 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.33.10.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.36.12.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.185.144.0/20 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.36.13.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.174.128.0/20 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.36.10.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.33.15.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.33.14.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.200.0/21 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.150.50.136/30 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.108.64.0/18 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.33.13.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.201.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.109.64.0/18 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.33.12.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.36.6.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.35.1.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.196.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.144.176.0/20 [170/54016] via 172.25.12.100, 4d03h, FastEthernet0
+D EX    10.36.4.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.35.3.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.248.222.0/23 [170/54016] via 172.25.12.100, 08:40:15, FastEthernet0
+D EX    10.228.194.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.195.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.36.3.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.250.222.0/23 [170/54016] via 172.25.12.100, 08:40:15, FastEthernet0
+D EX    10.228.192.0/23 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.253.216.0/21 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.36.1.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.33.4.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.233.36.247/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.233.36.246/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.233.36.245/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.220.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.212.247.27/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.233.36.244/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.185.128.0/20 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.36.90.64/27 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.252.64.128/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.228.216.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.252.64.129/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.228.214.0/24 [170/54016] via 172.25.12.100, 6d12h, FastEthernet0
+D EX    10.178.128.0/19 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.215.0/24 [170/54016] via 172.25.12.100, 6d12h, FastEthernet0
+D EX    10.179.128.0/19 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    10.228.212.0/24 [170/54016] via 172.25.12.100, 6d12h, FastEthernet0
+D EX    10.144.160.0/20 [170/54016] via 172.25.12.100, 5w3d, FastEthernet0
+D EX    10.112.64.0/18 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.213.0/24 [170/54016] via 172.25.12.100, 6d12h, FastEthernet0
+D EX    10.252.64.138/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.233.36.250/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.36.19.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.233.36.249/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.208.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.252.64.137/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.233.36.248/32 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.241.138.48/28 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.252.180.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.172.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.252.178.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.1.79.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.168.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.252.177.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.240.176.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.35.99.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.35.98.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.241.138.32/28 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.241.137.32/28 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.185.224.0/20 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.144.207.0/28 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.144.192.0/20 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.176.0/20 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.235.0.128/25 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.143.0/26 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.36.15.64/27 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.241.137.16/28 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.140.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D       10.241.136.16/28 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                         [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D EX    10.228.141.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.138.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.139.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.136.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.108.0.0/18 [170/53760] via 172.25.12.3, 7w0d, FastEthernet0
+                      [170/53760] via 172.25.12.2, 7w0d, FastEthernet0
+D EX    10.109.0.0/18 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    10.228.142.8/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.3.100.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.128.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.128.0/23 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.142.16/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.241.138.3/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.185.192.0/20 [170/54016] via 172.25.12.100, 2w4d, FastEthernet0
+D EX    10.36.90.0/27 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.255.128.0/19 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.252.128.0/17 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.127.3.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.36.88.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.252.143.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.179.192.0/19 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.36.87.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.252.140.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.148.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.112.0.0/18 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.252.138.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.252.136.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.144.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.150.50.208/29 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.145.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.174.36.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.241.138.240/28 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.111.0/24 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    10.252.65.53/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.228.108.0/24 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    10.252.65.52/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.185.48.0/20 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D       10.146.30.0/24 [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D EX    10.115.255.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D       10.146.31.0/24 [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D EX    10.228.103.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.179.48.0/20 [170/54016] via 172.25.12.100, 3w3d, FastEthernet0
+D EX    10.228.100.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.101.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.174.40.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.248.226.128/25 
+           [170/54016] via 172.25.12.100, 08:40:15, FastEthernet0
+D EX    10.228.126.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.252.103.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.228.127.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.124.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.124.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.125.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.122.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.228.123.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.228.120.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.243.110.0/24 [170/53760] via 172.25.12.3, 7w0d, FastEthernet0
+                        [170/53760] via 172.25.12.2, 7w0d, FastEthernet0
+D EX    10.228.121.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.228.118.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.146.0.0/19 [170/53760] via 172.25.12.3, 7w0d, FastEthernet0
+                      [170/53760] via 172.25.12.2, 7w0d, FastEthernet0
+D EX    10.228.119.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.228.116.0/24 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    10.111.255.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.117.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.111.254.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.228.114.0/24 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    10.174.56.0/21 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.115.0/24 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    10.252.104.0/21 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.228.112.0/24 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    10.228.113.0/24 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    10.253.119.32/28 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.252.119.32/28 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.235.0.64/27 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.174.0.0/17 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.174.0.0/16 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.178.30.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.108.192.0/18 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.178.31.0/28 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.174.3.0/24 [170/54016] via 172.25.12.100, 2w4d, FastEthernet0
+D EX    10.253.119.48/28 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.252.119.48/28 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.243.72.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.174.21.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.184.0.0/16 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.185.0.0/20 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.185.0.0/16 [170/54016] via 172.25.12.100, 1d11h, FastEthernet0
+D EX    10.174.17.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.174.18.0/26 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX    10.242.64.0/19 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.178.0.0/19 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.240.67.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.179.0.0/20 [170/54016] via 172.25.12.100, 5w1d, FastEthernet0
+D       10.108.63.224/27 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                         [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D EX    10.240.64.0/19 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.176.0.0/16 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.112.192.0/18 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.241.64.0/19 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.177.0.0/16 [170/54016] via 172.25.12.100, 1w2d, FastEthernet0
+D EX    10.254.72.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.252.72.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D       10.242.56.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D EX    10.228.47.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D       10.240.56.0/23 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.241.56.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.241.51.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.240.51.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.242.51.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.243.53.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.242.52.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.241.55.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.240.54.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D EX    10.174.104.0/24 [170/54016] via 172.25.12.100, 3w1d, FastEthernet0
+D       10.243.52.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.242.53.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.241.54.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.240.55.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.242.54.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.241.53.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.240.52.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.242.55.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.241.52.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D       10.240.53.0/24 [90/28416] via 172.25.12.3, 7w0d, FastEthernet0
+                       [90/28416] via 172.25.12.2, 7w0d, FastEthernet0
+D EX    10.241.136.160/28 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.185.96.0/20 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.54.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.178.96.0/19 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.52.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.53.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.228.50.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.174.120.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.240.26.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.235.1.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.241.26.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.235.0.0/26 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.242.26.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.185.80.0/20 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.174.64.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.211.1.61/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.240.28.0/22 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.108.128.0/18 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.178.95.0/28 [170/54016] via 172.25.12.100, 5w6d, FastEthernet0
+D EX    10.109.128.0/18 [170/54016] via 172.25.12.100, 5w1d, FastEthernet0
+D EX    10.178.80.0/20 [170/54016] via 172.25.12.100, 5w6d, FastEthernet0
+D EX    10.241.23.0/24 [170/54016] via 172.25.12.100, 6d08h, FastEthernet0
+D EX    10.230.0.0/16 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.174.72.0/22 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.242.21.0/24 [170/54016] via 172.25.12.100, 3w3d, FastEthernet0
+D EX    10.241.22.0/24 [170/54016] via 172.25.12.100, 5w1d, FastEthernet0
+D EX    10.241.21.0/24 [170/54016] via 172.25.12.100, 5w1d, FastEthernet0
+D EX    10.240.20.0/24 [170/54016] via 172.25.12.100, 5w1d, FastEthernet0
+D EX    10.228.0.0/16 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.241.180.160/28 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.240.21.0/24 [170/54016] via 172.25.12.100, 5w1d, FastEthernet0
+D EX    10.251.0.0/18 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.185.64.0/20 [170/54016] via 172.25.12.100, 6d12h, FastEthernet0
+D EX    10.254.0.0/18 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.252.65.67/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.255.0.0/19 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.252.65.66/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.251.4.0/22 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.252.0.0/16 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.253.0.0/21 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.253.0.0/16 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.127.2.128/26 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.112.128.0/18 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    10.252.10.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    10.247.0.0/18 [170/54016] via 172.25.12.100, 2w2d, FastEthernet0
+     161.242.0.0/16 is variably subnetted, 38 subnets, 3 masks
+D EX    161.242.87.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    161.242.84.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.69.30/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.92.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    161.242.67.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.71.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.70.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.69.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.68.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.68.13/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.71.54/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.71.55/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.57.66/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.71.56/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.71.57/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.71.58/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.98.0/23 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    161.242.96.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    161.242.106.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    161.242.68.82/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.68.81/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.68.69/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.71.74/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.55.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.57.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.56.0/24 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.68.96/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.57.20/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.57.21/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.68.148/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.56.202/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.56.205/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.56.204/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.131.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    161.242.130.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    161.242.133.0/24 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX    161.242.61.158/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+D EX    161.242.61.159/32 [170/54016] via 172.25.12.100, 2w3d, FastEthernet0
+     200.248.93.0/32 is subnetted, 1 subnets
+D EX    200.248.93.130 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX 192.168.2.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX 165.89.0.0/16 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX 192.168.3.0/24 [170/54016] via 172.25.12.100, 1w1d, FastEthernet0
+D EX 0.0.0.0/1 [170/28672] via 172.25.12.3, 07:55:55, FastEthernet0
+               [170/28672] via 172.25.12.2, 07:55:55, FastEthernet0
+D*EX 0.0.0.0/0 [170/28672] via 172.25.12.3, 1d08h, FastEthernet0
+               [170/28672] via 172.25.12.2, 1d08h, FastEthernet0
+D EX 172.16.0.0/12 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX 128.0.0.0/1 [170/28672] via 172.25.12.3, 07:55:55, FastEthernet0
+                 [170/28672] via 172.25.12.2, 07:55:55, FastEthernet0
+D EX 198.155.0.0/16 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+D EX 192.168.0.0/16 [170/54016] via 172.25.12.100, 7w0d, FastEthernet0
+sh vpc
+                               ^
+% Invalid input detected at '^' marker.
+
+sh ip bgp sum
+                                 ^
+% Invalid input detected at '^' marker.
+

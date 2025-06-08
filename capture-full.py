@@ -21,7 +21,7 @@ print(output_dir)
 devices_filename = "devices.txt"
 
 # Define the show commands you want to execute on this device
-commands = ['sh run | i hostname','sh run','sh int status','sh ip int bri','sh vlan','sh ver','sh inventory','sh mod','sh mac address-table','sh arp','sh cdp neighbors','sh ip protocols','sh ip route','sh vpc']
+commands = ['sh run | i hostname','sh run','sh int status','sh ip int bri','sh vlan','sh ver','sh inventory','sh mod','sh mac address-table','sh ip arp','sh cdp neighbors','sh ip protocols','sh ip route','sh vpc','sh ip bgp sum']
 
 # Open the devices file and read the list of devices
 with open(devices_filename, "r") as devices_file:

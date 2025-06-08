@@ -18,7 +18,7 @@ sh ver<br />
 sh inventory<br /> 
 sh mod<br /> 
 sh mac address-table<br /> 
-sh arp<br /> 
+sh ip arp<br /> 
 sh cdp neighbors<br /> 
 sh ip protocols<br /> 
 sh ip route<br /> 
